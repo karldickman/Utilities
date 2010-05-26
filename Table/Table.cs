@@ -168,17 +168,17 @@ namespace Formatting.Table
         protected internal List<Row> FormatLine(object[] values, char topBorder, char bottomBorder)
         {
             List<Row> lines = new List<Row> ();
-            if (topBorder != '\0')
+            if(values != null)
             {
-                lines.Add (rowSeperatorFactory.MakeInstance (topBorder, values.Length));
-            }
-            if (values != null)
-            {
+                if (topBorder != '\0')
+                {
+                    lines.Add (rowSeperatorFactory.MakeInstance (topBorder, values.Length));
+                }
                 lines.Add (rowFactory.MakeInstance (values));
-            }
-            if (bottomBorder != '\0')
-            {
-                lines.Add (rowSeperatorFactory.MakeInstance (bottomBorder, values.Length));
+                if (bottomBorder != '\0')
+                {
+                    lines.Add (rowSeperatorFactory.MakeInstance (bottomBorder, values.Length));
+                }
             }
             return lines;
         }
