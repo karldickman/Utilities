@@ -12,10 +12,16 @@ namespace Formatting
     namespace Table.Exceptions
     {
         
-    	public class InvalidBaseTableException : FormattingException
+        public class DimensionMismatchException : FormattingException
+        {
+            public DimensionMismatchException () : base() {}
+            public DimensionMismatchException (string message) : base(message) {}
+        }
+        
+    	public class InvalidTableException : FormattingException
     	{
-            public InvalidBaseTableException () : base() {}
-    		public InvalidBaseTableException (string message) : base(message) {}
+            public InvalidTableException () : base() {}
+    		public InvalidTableException (string message) : base(message) {}
     	}
         
         public class InvalidColumnFormatException : FormattingException

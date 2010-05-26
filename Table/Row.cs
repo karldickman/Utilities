@@ -1,4 +1,5 @@
 using Formatting.Table.Exceptions;
+using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 
@@ -10,41 +11,53 @@ namespace Formatting.Table
     /// </summary>
     public class Row
     {
-        private List<ICell> cells;
-        private List<char> seperators;
+        private ICell[] cells;
+        private char[] seperators;
         
-        /// <summary>
-        /// The cells in this row.
-        /// </summary>
-        public List<ICell> Cells
+        public int ColumnCount
         {
-            get { return cells; }
-        }
-        
-        /// <summary>
-        /// The vertical seperators between adjacent cells.
-        /// </summary>
-        public List<char> Seperators
-        {
-            get { return seperators; }
+            get { return cells.Length; }
         }
 
-        protected internal Row (List<ICell> cells, List<char> seperators)
+        internal Row (ICell[] cells, char[] seperators)
         {
             this.cells = cells;
             this.seperators = seperators;
+        }
+        
+        /// <summary>
+        /// Get the width of colum i, zero-indexed.
+        /// </summary>
+        public int ColumnWidth (int column)
+        {
+            return cells[column].Width ();
+        }
+        
+        /// <summary>
+        /// Pad all cells in the row to the given widths.
+        /// </summary>
+        public void Pad (int[] widths)
+        {
+            if (cells.Length != widths.Length)
+            {
+                throw (new DimensionMismatchException ());
+            }
+            for (int i = 0; i < cells.Length; i++)
+            {
+                cells[i].Pad (widths[i]);
+            }
         }
         
         public override string ToString ()
         {
             int i;
             string result = "";
-            for (i = 0; i < Cells.Count; i++)
+            for (i = 0; i < cells.Length; i++)
             {
-                result += Seperators[i];
-                result += Cells[i];
+                result += seperators[i];
+                result += cells[i];
             }
-            return result + Seperators[i];
+            return result + seperators[i];
         }
     }
     
@@ -53,74 +66,87 @@ namespace Formatting.Table
     /// </summary>
     public class RowFactory
     {
-        protected internal static List<char> MakeColumnSeperators(char leftBorder, char columnSeperator, char rightBorder, int columnCount)
-        {
-            List<char> columnSeperators = new List<char> ();
-            columnSeperators.Add (leftBorder);
-            for (int i = 0; i < columnCount - 1; i++)
-            {
-                columnSeperators.Add (columnSeperator);
-            }
-            columnSeperators.Add (rightBorder);
-            return columnSeperators;
-        }
+        private char columnSeperator;
+        private char leftBorder;
+        private char rightBorder;
         
-        public Row MakeInstance (char rowSeperator, int columnCount)
-        {
-            return MakeInstance (rowSeperator, '\0', columnCount);
-        }
+        public RowFactory(char columnSeperator) : this('\0', columnSeperator, '\0') {}
         
-        public Row MakeInstance (char rowSeperator, char columnSeperator, int columnCount)
+        public RowFactory (char leftBorder, char columnSeperator, char rightBorder)
         {
-            return MakeInstance (rowSeperator, '\0', columnSeperator, '\0', columnCount);
-        }
-        
-        public Row MakeInstance (char rowSeperator, char leftBorder, char columnSeperator, char rightBorder, int columnCount)
-        {
-            return MakeInstance (rowSeperator, MakeColumnSeperators (leftBorder, columnSeperator, rightBorder, columnCount));
+            this.leftBorder = leftBorder;
+            this.rightBorder = rightBorder;
+            this.columnSeperator = columnSeperator;
         }
         
         /// <summary>
         /// Make a new horizontal seperator.
         /// </summary>
-        public Row MakeInstance (char rowSeperator, List<char> columnSeperators)
+        public Row MakeInstance (char rowSeperator, int columnCount)
         {
-            List<ICell> cells = new List<ICell> ();
-            for (int i = 0; i < columnSeperators.Count - 1; i++)
+            ICell[] cells = new HorizontalCellSeperator[columnCount];
+            for (int i = 0; i < columnCount; i++)
             {
-                cells.Add (new HorizontalCellSeperator (rowSeperator));
+                cells[i] = new HorizontalCellSeperator (rowSeperator);
             }
-            return MakeInstance (cells, columnSeperators);
+            return new Row (cells, Seperators (columnCount));
         }
         
-        public Row MakeInstance (List<ICell> cells)
+        public Row MakeInstance (object[] values)
         {
-            return MakeInstance (cells, '\0');
-        }
-        
-        public Row MakeInstance (List<ICell> cells, char columnSeperator)
-        {
-            return MakeInstance (cells, '\0', columnSeperator, '\0');
+            ICell[] cells = new Cell[values.Length];
+            for (int i = 0; i < cells.Length; i++)
+            {
+                cells[i] = new Cell (values[i]);
+            }
+            return MakeInstance (cells);
         }
         
         /// <summary>
-        /// Make a new row with the given values, cell alignments, and column seperators.
+        /// Make a new row with the given cells.
         /// </summary>
-        public Row MakeInstance (List<ICell> cells, char leftBorder, char columnSeperator, char rightBorder)
+        public Row MakeInstance (ICell[] cells)
         {
-            return MakeInstance (cells, MakeColumnSeperators(leftBorder, columnSeperator, rightBorder, cells.Count));
+            return new Row (cells, Seperators (cells.Length));
         }
         
         /// <summary>
-        /// Make a new row instance.
+        /// The seperators needed for a row with the given number of columns.
         /// </summary>
-        public Row MakeInstance (List<ICell> cells, List<char> seperators)
+        public char[] Seperators (int columnCount)
         {
-            if (seperators.Count + 1 != cells.Count)
+            char[] seperators = new char[columnCount + 1];
+            for (int i = 0; i < columnCount; i++)
             {
-                throw (new InvalidRowException ());
+                seperators[i] = columnSeperator;
             }
-            return new Row (cells, seperators);
+            seperators[0] = leftBorder;
+            seperators[columnCount] = rightBorder;
+            return seperators;
+        }
+    }
+    
+    [TestFixture]
+    public class TestRowFactory
+    {
+        private RowFactory rowFactory;
+        
+        [SetUp]
+        public void Setup ()
+        {
+            rowFactory = new RowFactory ('/', '|', 'X');
+        }
+        
+        [Test]
+        public void TestSeperators()
+        {
+            char[] expected = {'/', '|', '|', '|', '|', 'X'};
+            char[] actual = rowFactory.Seperators(5);
+            Assert.AreEqual(expected.Length, actual.Length);
+            for(int i = 0; i < expected.Length; i++)
+            {
+                Assert.AreEqual(expected[i], actual[i]);
+            }
         }
     }
 }

@@ -28,18 +28,19 @@ namespace Formatting.Table
 		private char seperator;
         private string text;
 		
+        /*
 		protected internal char Seperator
 		{
 			get { return seperator; }
-		}
+		}*/
         
         /// <summary>
         /// The text in the cell.
         /// </summary>
-        public string Text
+        protected internal string Text
         {
             get { return text; }
-            protected internal set { text = value; }
+            set { text = value; }
         }
 		
 		public HorizontalCellSeperator (char seperator)
@@ -49,10 +50,10 @@ namespace Formatting.Table
 		
 		public void Pad (int width)
 		{
-			Text = "";
+			text = "";
 			for (int i = 0; i < width; i++)
 			{
-				Text += Seperator;
+				text += seperator;
 			}
 		}
 		
@@ -72,31 +73,15 @@ namespace Formatting.Table
 		private alignment alignment;
         private string text;
 		private object value_;
-		
-		/// <summary>
-		/// The alignment of the text in the cell.
-		/// </summary>
-		public alignment Alignment
-		{
-			get { return alignment; }
-		}
         
         /// <summary>
         /// The text in the cell.
         /// </summary>
-        public string Text
+        protected internal string Text
         {
             get { return text; }
-            protected internal set { text = value; }
+            set { text = value; }
         }
-		
-		/// <summary>
-		/// The value in the cell.
-		/// </summary>
-		public object Value
-		{
-			get { return value_; }
-		}
 		
 		public Cell (object value_) : this(value_, DEFAULT_ALIGNMENT) {}
 		
@@ -108,25 +93,28 @@ namespace Formatting.Table
         
 		public void Pad (int width)
         {
-            Text = Value.ToString ();
-            if (Text.Length > width)
+            text = value_.ToString ();
+            if (text.Length > width)
 			{
-		        Text = Text.Substring (0, width);
+		        text = text.Substring (0, width);
 		    }
 		    switch (alignment)
 			{
 		    case alignment.L:
-		        Text = Text.PadRight (width);
+		        text = text.PadRight (width);
                 break;
 		    case alignment.R:
-		        Text = Text.PadLeft (width);
+		        text = text.PadLeft (width);
                 break;
 			}
 		}
 		
+        /// <summary>
+        /// Get the default width of the cell.
+        /// </summary>
 		public int Width ()
 		{
-			return Value.ToString ().Length;
+			return value_.ToString ().Length;
 		}
 	}
 	
