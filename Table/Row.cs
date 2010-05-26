@@ -18,7 +18,7 @@ namespace Formatting.Table
         {
             get { return cells.Length; }
         }
-
+      
         internal Row (ICell[] cells, char[] seperators)
         {
             this.cells = cells;
@@ -54,10 +54,17 @@ namespace Formatting.Table
             string result = "";
             for (i = 0; i < cells.Length; i++)
             {
-                result += seperators[i];
+                if (seperators[i] != '\0')
+                {
+                    result += seperators[i];
+                }
                 result += cells[i];
             }
-            return result + seperators[i];
+            if (seperators[i] != '\0')
+            {
+                result += seperators[i];
+            }
+            return result;
         }
     }
     
@@ -95,9 +102,22 @@ namespace Formatting.Table
         public Row MakeInstance (object[] values)
         {
             ICell[] cells = new Cell[values.Length];
+            for (int i = 0; i < cells.Length; i++) {
+                cells[i] = new Cell (values[i]);
+            }
+            return MakeInstance (cells);
+        }
+        
+        public Row MakeInstance (object[] values, Alignment[] alignments)
+        {
+            if (alignments == null) 
+            {
+               return MakeInstance (values);
+            }
+            ICell[] cells = new Cell[values.Length];
             for (int i = 0; i < cells.Length; i++)
             {
-                cells[i] = new Cell (values[i]);
+                cells[i] = new Cell (values[i], alignments[i]);
             }
             return MakeInstance (cells);
         }

@@ -1,4 +1,5 @@
 using Formatting.Table.Exceptions;
+using System;
 using System.Collections.Generic;
 
 namespace Formatting.Table
@@ -13,6 +14,7 @@ namespace Formatting.Table
         {
             this.rows = rows;
             this.maxWidths = maxWidths;
+            Pad();
         }
         
         /// <summary>
@@ -39,12 +41,12 @@ namespace Formatting.Table
         /// <summary>
         /// Get all the physical lines in a string representation of the table.
         /// </summary>
-        public string[] Lines ()
+        public List<string> Lines ()
         {
-            string[] lines = new string[rows.Count];
-            for (int i = 0; i < lines.Length; i++)
+            List<string> lines = new List<string> ();
+            foreach (Row row in rows)
             {
-                lines[i] = rows[i].ToString ();
+                lines.Add (row.ToString ());
             }
             return lines;
         }
@@ -61,32 +63,38 @@ namespace Formatting.Table
             }
         }
     }
-    
-    public interface ITableFormatter
-    {
-        string[] Format(object[,] values);
-        string[] Format(object[,] values, int[] maxWidths);
-        string[] Format(object[] header, object[,] values);
-        string[] Format(object[] header, object[,] values, int[] maxWidths);
-        string[] Format(object[] header, object[,] values, object[] footer);
-        string[] Format(object[] header, object[,] values, object[] footer, int[] maxWidths);
-    }
 
-    public class TableFormatter : ITableFormatter
+    public class TableFormatter
     {
-        private char bodyBottom;
-        private char bodyTop;
         private char bottomBorder;
         private RowFactory rowFactory;
         private RowFactory rowSeperatorFactory;
         private char topBorder;
         
-        public TableFormatter (char leftBorder, char columnSeperator, char rightBorder, char topBorder, char bottomBorder, char bodyTop, char bodyBottom, char corner)
+        protected internal char BottomBorder
+        {
+            get { return bottomBorder; }
+        }
+        
+        protected internal RowFactory RowFactory
+        {
+            get { return rowFactory; }
+        }
+        
+        protected internal RowFactory RowSeperatorFactory
+        {
+            get { return rowSeperatorFactory; }
+        }
+        
+        protected internal char TopBorder
+        {
+             get { return topBorder; }
+        }
+        
+        public TableFormatter (char leftBorder, char columnSeperator, char rightBorder, char topBorder, char bottomBorder, char corner)
         {
             this.topBorder = topBorder;
             this.bottomBorder = bottomBorder;
-            this.bodyTop = bodyTop;
-            this.bodyBottom = bodyBottom;
             rowFactory = new RowFactory (leftBorder, columnSeperator, rightBorder);
             char sepLeftBorder = corner, sepColumnSeperator = corner, sepRightBorder = corner;
             if (leftBorder == '\0')
@@ -114,77 +122,114 @@ namespace Formatting.Table
             return maxWidths;
         }
         
-        public string[] Format (object[] header, object[,] values, object[] footer)
+        public List<string> Format (List<object[]> values)
         {
-            return Format (header, values, footer, DefaultMaxWidths(header.Length));
-        }
-
-
-        public string[] Format (object[] header, object[,] values, object[] footer, int[] maxWidths)
-        {
-            int columnCount = values.GetLength (1);
-            List<Row> rows;
-            Table table;
-            if (header != null && header.Length != columnCount || footer != null && footer.Length != columnCount || maxWidths.Length != columnCount)
-            {
-                throw (new DimensionMismatchException ());
-            }
-            rows = FormatLine(header, topBorder, bodyTop);
-            foreach (object[] row in values)
-            {
-                rows.Add (rowFactory.MakeInstance (row));
-            }
-            rows.AddRange (FormatLine(footer, bodyBottom, bottomBorder));
-            table = new Table (rows, maxWidths);
-            return table.Lines();
-        }
-
-        public string[] Format (object[] header, object[,] values)
-        {
-            return Format (header, values, DefaultMaxWidths (header.Length));
-        }
-
-
-        public string[] Format (object[] header, object[,] values, int[] maxWidths)
-        {
-            return Format (header, values, null, maxWidths);
-        }
-
-
-        public string[] Format (object[,] values)
-        {
-            return Format (values, DefaultMaxWidths(values.GetLength(1)));
-        }
-
-
-        public string[] Format (object[,] values, int[] maxWidths)
-        {
-            return Format (null, values, maxWidths);
+            return Format (values, null);
         }
         
-        /// <summary>
-        /// Format a line of the table with bottom and top border.
-        /// </summary>
-        protected internal List<Row> FormatLine(object[] values, char topBorder, char bottomBorder)
+        public List<string> Format (List<object[]> values, Alignment[] alignments)
         {
-            List<Row> lines = new List<Row> ();
-            if(values != null)
+            List<Row> rows = FormatRows (values, alignments);
+            return new Table(rows, DefaultMaxWidths(rows[0].ColumnCount)).Lines();
+        }
+        
+        protected internal List<Row> FormatRows(List<object[]> values, Alignment[] alignments)
+        {
+            List<Row> rows = new List<Row>();
+            int columnCount = values[0].Length;
+            if(topBorder != '\0')
             {
-                if (topBorder != '\0')
-                {
-                    lines.Add (rowSeperatorFactory.MakeInstance (topBorder, values.Length));
-                }
-                lines.Add (rowFactory.MakeInstance (values));
-                if (bottomBorder != '\0')
-                {
-                    lines.Add (rowSeperatorFactory.MakeInstance (bottomBorder, values.Length));
-                }
+                rows.Add(rowSeperatorFactory.MakeInstance(topBorder, columnCount));
             }
-            return lines;
+            foreach(object[] valueRow in values)
+            {
+                rows.Add (rowFactory.MakeInstance (valueRow, alignments));
+            }
+            if(bottomBorder != '\0')
+            {
+                rows.Add(rowSeperatorFactory.MakeInstance(bottomBorder, columnCount));
+            }
+            return rows;
         }
     }
     
-    public class PrettyTableFormatter : TableFormatter
+    public class LabeledTableFormatter : TableFormatter
+    {
+        private char bottomBorder;
+        private char topBorder;
+        
+        public LabeledTableFormatter (char leftBorder, char columnSeperator, char rightBorder, char topBorder, char bottomBorder, char bodyTop, char bodyBottom, char corner) : base(leftBorder, columnSeperator, rightBorder, bodyTop, bodyBottom, corner)
+        {
+            this.bottomBorder = bottomBorder;
+            this.topBorder = topBorder;
+        }
+        
+        public new List<string> Format (List<object[]> values)
+        {
+            return Format (values, null);
+        }
+        
+        public new List<string> Format (List<object[]> values, Alignment[] alignments)
+        {
+            return Format (null, values, alignments);
+        }
+        
+        public List<string> Format (object[] header, List<object[]> values)
+        {
+            return Format (header, values, null);
+        }
+        
+        public List<string> Format (object[] header, List<object[]> values, Alignment[] alignments)
+        {
+            return Format (header, values, null, alignments);
+        }
+        
+        public List<string> Format (object[] header, List<object[]> values, object[] footer)
+        {
+            return Format (header, values, footer, null);
+        }
+        
+        public List<string> Format (object[] header, List<object[]> values, object[] footer, Alignment[] alignments)
+        {
+            List<Row> rows = FormatRows (header, values, footer, alignments);
+            return new Table (rows, DefaultMaxWidths (rows[0].ColumnCount)).Lines ();
+        }
+        
+        protected internal List<Row> FormatRows (object[] header, List<object[]> values, object[] footer, Alignment[] alignments)
+        {
+            int columnCount = values[0].Length;
+            List<Row> rows = new List<Row> ();
+            List<Row> bodyRows = base.FormatRows (values, alignments);
+            if (topBorder != '\0')
+            {
+                rows.Add (RowSeperatorFactory.MakeInstance (topBorder, columnCount));
+            }
+            if (header != null) 
+            {
+                rows.Add (RowFactory.MakeInstance (header));
+            }
+            else if(base.TopBorder != '\0')
+            {
+                bodyRows.RemoveAt (0);
+            }
+            rows.AddRange (bodyRows);
+            if (footer != null)
+            {
+                rows.Add (RowFactory.MakeInstance (footer));
+            }
+            else if(base.BottomBorder != '\0')
+            {
+                rows.RemoveAt (rows.Count - 1);
+            }
+            if (bottomBorder != '\0')
+            {
+                rows.Add (RowSeperatorFactory.MakeInstance (bottomBorder, columnCount));
+            }
+            return rows;
+        }
+    }
+    
+    public class PrettyTableFormatter : LabeledTableFormatter
     {
         public PrettyTableFormatter() : base('|', '|', '|', '-', '-', '-', '-', '+') {}
     }
