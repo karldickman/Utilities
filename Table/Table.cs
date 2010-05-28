@@ -91,6 +91,8 @@ namespace Formatting.Table
              get { return topBorder; }
         }
         
+        public TableFormatter (char columnSeperator) : this('\0', columnSeperator, '\0', '\0', '\0', '\0') {}
+        
         public TableFormatter (char leftBorder, char columnSeperator, char rightBorder, char topBorder, char bottomBorder, char corner)
         {
             this.topBorder = topBorder;
