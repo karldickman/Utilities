@@ -1,6 +1,6 @@
 using System;
 
-namespace Formatting
+namespace TextFormat
 {
 	
 	public class FormattingException : Exception

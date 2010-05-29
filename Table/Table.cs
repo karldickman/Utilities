@@ -1,8 +1,8 @@
-using Formatting.Table.Exceptions;
 using System;
 using System.Collections.Generic;
+using TextFormat.Table.Exceptions;
 
-namespace Formatting.Table
+namespace TextFormat.Table
 {
     
     public class Table

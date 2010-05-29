@@ -1,9 +1,8 @@
 using NUnit.Framework;
 using System;
 
-namespace Formatting.Table
+namespace TextFormat.Table
 {
-    
     /// <summary>
     /// The interface that all cells of the table must implement.
     /// </summary>

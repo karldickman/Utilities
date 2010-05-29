@@ -1,11 +1,10 @@
-using Formatting.Table.Exceptions;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using TextFormat.Table.Exceptions;
 
-namespace Formatting.Table
+namespace TextFormat.Table
 {
-    
     /// <summary>
     /// A row in the table.
     /// </summary>

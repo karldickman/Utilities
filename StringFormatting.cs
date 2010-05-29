@@ -1,7 +1,7 @@
 using NUnit.Framework;
 using System;
 
-namespace Formatting
+namespace TextFormat
 {
     
     public delegate string Alignment(object toAlign, int width);
