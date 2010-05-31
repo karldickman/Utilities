@@ -3,7 +3,6 @@ using System;
 
 namespace TextFormat
 {
-    
     public delegate string Alignment(object toAlign, int width);
     
     public class StringFormatting

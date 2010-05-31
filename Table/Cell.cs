@@ -24,34 +24,33 @@ namespace TextFormat.Table
     /// </summary>
     public class HorizontalCellSeperator : ICell
     {
-        private char seperator;
-        private string text;
-        
         /// <summary>
-        /// The text in the cell.
+        /// The character used to seperate rows.
         /// </summary>
-        protected internal string Text
-        {
-            get { return text; }
-        }
-        
+        protected internal char Seperator { get; set; }
+
+        /// <summary>
+        /// The text of the cell.
+        /// </summary>
+        protected internal string Text { get; set; }
+
         public HorizontalCellSeperator (char seperator)
         {
-            this.seperator = seperator;
+            Seperator = seperator;
         }
         
         public void Pad (int width)
         {
-            text = "";
+            Text = "";
             for (int i = 0; i < width; i++)
             {
-                text += seperator;
+                Text += Seperator;
             }
         }
         
-        public override string ToString ()
+        override public string ToString ()
         {
-            return text;
+            return Text;
         }
         
         public int Width ()
@@ -65,11 +64,22 @@ namespace TextFormat.Table
     /// </summary>
     public class Cell : ICell
     {        
-        private static readonly Alignment DEFAULT_ALIGNMENT = StringFormatting.LeftJustified;
-        
-        private Alignment Align;
-        private string text;
-        private object value_;
+        protected internal static readonly Alignment DEFAULT_ALIGNMENT = StringFormatting.LeftJustified;
+
+        /// <summary>
+        /// The <see cref="Alignment"/> of the cell.
+        /// </summary>
+        protected internal Alignment Align { get; set; }
+
+        /// <summary>
+        /// The text in the rendered cell.
+        /// </summary>
+        protected internal string Text { get; set; }
+
+        /// <summary>
+        /// The value stored in the cell.
+        /// </summary>
+        protected internal object Value { get; set; }
         
         public Cell (object value_) : this(value_, DEFAULT_ALIGNMENT) {}
         
@@ -79,18 +89,18 @@ namespace TextFormat.Table
             {
                 Align = DEFAULT_ALIGNMENT;
             }
-            this.value_ = value_;
+            Value = value_;
             this.Align = Align;
         }
         
         public void Pad (int width)
         {
-            text = Align (value_, width);
+            Text = Align (Value, width);
         }
         
-        public override string ToString ()
+        override public string ToString ()
         {
-            return text;
+            return Text;
         }
         
         /// <summary>
@@ -98,11 +108,11 @@ namespace TextFormat.Table
         /// </summary>
         public int Width ()
         {
-            if (value_ == null)
+            if (Value == null)
             {
                 return 0;
             }     
-            return value_.ToString ().Length;
+            return Value.ToString ().Length;
         }
     }
     

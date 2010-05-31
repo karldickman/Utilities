@@ -10,18 +10,18 @@ namespace TextFormat.Table
     /// </summary>
     public class Row
     {
-        private ICell[] cells;
-        private char[] seperators;
+        protected internal ICell[] Cells { get; set; }
+        protected internal char[] Seperators { get; set; }
         
         public int ColumnCount
         {
-            get { return cells.Length; }
+            get { return Cells.Length; }
         }
       
         internal Row (ICell[] cells, char[] seperators)
         {
-            this.cells = cells;
-            this.seperators = seperators;
+            Cells = cells;
+            Seperators = seperators;
         }
         
         /// <summary>
@@ -29,7 +29,7 @@ namespace TextFormat.Table
         /// </summary>
         public int ColumnWidth (int column)
         {
-            return cells[column].Width ();
+            return Cells[column].Width ();
         }
         
         /// <summary>
@@ -37,13 +37,13 @@ namespace TextFormat.Table
         /// </summary>
         public void Pad (int[] widths)
         {
-            if (cells.Length != widths.Length)
+            if (Cells.Length != widths.Length)
             {
                 throw (new DimensionMismatchException ());
             }
-            for (int i = 0; i < cells.Length; i++)
+            for (int i = 0; i < Cells.Length; i++)
             {
-                cells[i].Pad (widths[i]);
+                Cells[i].Pad (widths[i]);
             }
         }
         
@@ -51,17 +51,17 @@ namespace TextFormat.Table
         {
             int i;
             string result = "";
-            for (i = 0; i < cells.Length; i++)
+            for (i = 0; i < Cells.Length; i++)
             {
-                if (seperators[i] != '\0')
+                if (Seperators[i] != '\0')
                 {
-                    result += seperators[i];
+                    result += Seperators[i];
                 }
-                result += cells[i];
+                result += Cells[i];
             }
-            if (seperators[i] != '\0')
+            if (Seperators[i] != '\0')
             {
-                result += seperators[i];
+                result += Seperators[i];
             }
             return result;
         }
@@ -72,17 +72,17 @@ namespace TextFormat.Table
     /// </summary>
     public class RowFactory
     {
-        private char columnSeperator;
-        private char leftBorder;
-        private char rightBorder;
+        protected internal char ColumnSeperator { get; set; }
+        protected internal char LeftBorder { get; set; }
+        protected internal char RightBorder { get; set; }
         
         public RowFactory(char columnSeperator) : this('\0', columnSeperator, '\0') {}
         
         public RowFactory (char leftBorder, char columnSeperator, char rightBorder)
         {
-            this.leftBorder = leftBorder;
-            this.rightBorder = rightBorder;
-            this.columnSeperator = columnSeperator;
+            LeftBorder = leftBorder;
+            RightBorder = rightBorder;
+            ColumnSeperator = columnSeperator;
         }
         
         /// <summary>
@@ -137,10 +137,10 @@ namespace TextFormat.Table
             char[] seperators = new char[columnCount + 1];
             for (int i = 0; i < columnCount; i++)
             {
-                seperators[i] = columnSeperator;
+                seperators[i] = ColumnSeperator;
             }
-            seperators[0] = leftBorder;
-            seperators[columnCount] = rightBorder;
+            seperators[0] = LeftBorder;
+            seperators[columnCount] = RightBorder;
             return seperators;
         }
     }
