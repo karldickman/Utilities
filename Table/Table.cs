@@ -4,11 +4,30 @@ using TextFormat.Table.Exceptions;
 
 namespace TextFormat.Table
 {
+    /// <summary>
+    /// A representation of a table, consisting of a bunch of rows of cells.
+    /// </summary>
     public class Table
     {
+        /// <summary>
+        /// The maximum widths of each column.
+        /// </summary>
         protected internal int[] MaxWidths { get; set; }
+        
+        /// <summary>
+        /// The rows of teh table.
+        /// </summary>
         protected internal IList<Row> Rows { get; set; }
         
+        /// <summary>
+        /// Create a new table.
+        /// </summary>
+        /// <param name="rows">
+        /// A <see cref="IList<Row>"/> of the rows in the table.
+        /// </param>
+        /// <param name="maxWidths">
+        /// A <see cref="System.Int32[]"/>.  The maximum widths of the columns.
+        /// </param>
         protected internal Table (IList<Row> rows, int[] maxWidths)
         {
             Rows = rows;
@@ -61,157 +80,5 @@ namespace TextFormat.Table
                 row.Pad (columnWidths);
             }
         }
-    }
-
-    public class TableFormatter
-    {
-        protected internal char BottomBorder { get; set; }
-        protected internal RowFactory RowFactory { get; set; }
-        protected internal RowFactory RowSeperatorFactory { get; set; }
-        protected internal char TopBorder { get; set; }
-        
-        public TableFormatter (char columnSeperator) : this('\0', columnSeperator, '\0', '\0', '\0', '\0') {}
-        
-        public TableFormatter (char leftBorder, char columnSeperator, char rightBorder, char topBorder, char bottomBorder, char corner)
-        {
-            TopBorder = topBorder;
-            BottomBorder = bottomBorder;
-            RowFactory = new RowFactory (leftBorder, columnSeperator, rightBorder);
-            char sepLeftBorder = corner, sepColumnSeperator = corner, sepRightBorder = corner;
-            if (leftBorder == '\0')
-            {
-                sepLeftBorder = '\0';
-            }
-            if (columnSeperator == '\0')
-            {
-                sepColumnSeperator = '\0';
-            }
-            if (rightBorder == '\0')
-            {
-                sepRightBorder = '\0';
-            }
-            RowSeperatorFactory = new RowFactory (sepLeftBorder, sepColumnSeperator, sepRightBorder);
-        }
-        
-        protected internal static int[] DefaultMaxWidths(int size)
-        {
-            int[] maxWidths = new int[size];
-            for (int i = 0; i < size; i++)
-            {
-                maxWidths[i] = int.MaxValue;
-            }
-            return maxWidths;
-        }
-        
-        public IList<string> Format (IList<object[]> values)
-        {
-            return Format (values, null);
-        }
-        
-        public IList<string> Format (IList<object[]> values, Alignment[] alignments)
-        {
-            IList<Row> rows = FormatRows (values, alignments);
-            return new Table(rows, DefaultMaxWidths(rows[0].ColumnCount)).Lines();
-        }
-        
-        protected internal IList<Row> FormatRows(IList<object[]> values, Alignment[] alignments)
-        {
-            IList<Row> rows = new List<Row>();
-            int columnCount = values[0].Length;
-            if(TopBorder != '\0')
-            {
-                rows.Add(RowSeperatorFactory.MakeInstance(TopBorder, columnCount));
-            }
-            foreach(object[] valueRow in values)
-            {
-                rows.Add (RowFactory.MakeInstance (valueRow, alignments));
-            }
-            if(BottomBorder != '\0')
-            {
-                rows.Add(RowSeperatorFactory.MakeInstance(BottomBorder, columnCount));
-            }
-            return rows;
-        }
-    }
-    
-    public class LabeledTableFormatter : TableFormatter
-    {
-        new protected internal char BottomBorder { get; set; }
-        new protected internal char TopBorder { get; set; }
-        
-        public LabeledTableFormatter (char leftBorder, char columnSeperator, char rightBorder, char topBorder, char bottomBorder, char bodyTop, char bodyBottom, char corner) : base(leftBorder, columnSeperator, rightBorder, bodyTop, bodyBottom, corner)
-        {
-            BottomBorder = bottomBorder;
-            TopBorder = topBorder;
-        }
-        
-        new public IList<string> Format (IList<object[]> values)
-        {
-            return Format (values, null);
-        }
-        
-        new public IList<string> Format (IList<object[]> values, Alignment[] alignments)
-        {
-            return Format (null, values, alignments);
-        }
-        
-        public IList<string> Format (object[] header, IList<object[]> values)
-        {
-            return Format (header, values, null);
-        }
-        
-        public IList<string> Format (object[] header, IList<object[]> values, Alignment[] alignments)
-        {
-            return Format (header, values, null, alignments);
-        }
-        
-        public IList<string> Format (object[] header, IList<object[]> values, object[] footer)
-        {
-            return Format (header, values, footer, null);
-        }
-        
-        public IList<string> Format (object[] header, IList<object[]> values, object[] footer, Alignment[] alignments)
-        {
-            IList<Row> rows = FormatRows (header, values, footer, alignments);
-            return new Table (rows, DefaultMaxWidths (rows[0].ColumnCount)).Lines ();
-        }
-        
-        protected internal IList<Row> FormatRows (object[] header, IList<object[]> values, object[] footer, Alignment[] alignments)
-        {
-            int columnCount = values[0].Length;
-            List<Row> rows = new List<Row> ();
-            IList<Row> bodyRows = base.FormatRows (values, alignments);
-            if (TopBorder != '\0')
-            {
-                rows.Add (RowSeperatorFactory.MakeInstance (TopBorder, columnCount));
-            }
-            if (header != null) 
-            {
-                rows.Add (RowFactory.MakeInstance (header));
-            }
-            else if(base.TopBorder != '\0')
-            {
-                bodyRows.RemoveAt (0);
-            }
-            rows.AddRange(bodyRows);
-            if (footer != null)
-            {
-                rows.Add (RowFactory.MakeInstance (footer));
-            }
-            else if(base.BottomBorder != '\0')
-            {
-                rows.RemoveAt (rows.Count - 1);
-            }
-            if (BottomBorder != '\0')
-            {
-                rows.Add (RowSeperatorFactory.MakeInstance (BottomBorder, columnCount));
-            }
-            return rows;
-        }
-    }
-    
-    public class PrettyTableFormatter : LabeledTableFormatter
-    {
-        public PrettyTableFormatter() : base('|', '|', '|', '-', '-', '-', '-', '+') {}
     }
 }

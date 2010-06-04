@@ -14,29 +14,29 @@ namespace TextFormat.Table
         void Pad(int width);
         
         /// <summary>
-        /// Returns the width of the cell.
+        /// Get the width required for the data in the cell.
         /// </summary>
         int Width();
     }
     
     /// <summary>
-    /// The horizontal seperator between two cells.
+    /// The horizontal separator between two cells.
     /// </summary>
-    public class HorizontalCellSeperator : ICell
+    public class HorizontalCellSeparator : ICell
     {
         /// <summary>
         /// The character used to seperate rows.
         /// </summary>
-        protected internal char Seperator { get; set; }
+        protected internal char Separator { get; set; }
 
         /// <summary>
         /// The text of the cell.
         /// </summary>
         protected internal string Text { get; set; }
 
-        public HorizontalCellSeperator (char seperator)
+        public HorizontalCellSeparator (char separator)
         {
-            Seperator = seperator;
+            Separator = separator;
         }
         
         public void Pad (int width)
@@ -44,10 +44,13 @@ namespace TextFormat.Table
             Text = "";
             for (int i = 0; i < width; i++)
             {
-                Text += Seperator;
+                Text += Separator;
             }
         }
         
+        /// <summary>
+        /// Render the cell.
+        /// </summary>
         override public string ToString ()
         {
             return Text;
@@ -64,7 +67,11 @@ namespace TextFormat.Table
     /// </summary>
     public class Cell : ICell
     {        
-        protected internal static readonly Alignment DEFAULT_ALIGNMENT = StringFormatting.LeftJustified;
+        /// <summary>
+        /// The default alignment for text in the cell.
+        /// </summary>
+        protected internal static readonly Alignment DEFAULT_ALIGNMENT = 
+            StringFormatting.LeftJustified;
 
         /// <summary>
         /// The <see cref="Alignment"/> of the cell.
@@ -98,6 +105,9 @@ namespace TextFormat.Table
             Text = Align (Value, width);
         }
         
+        /// <summary>
+        /// Render the cell.
+        /// </summary>
         override public string ToString ()
         {
             return Text;
@@ -117,15 +127,34 @@ namespace TextFormat.Table
     }
     
     [TestFixture]
-    public class TestHorizontalCellSeperator
+    public class TestHorizontalCellSeparator
     {
         [Test]
         public void TestPad ()
         {
-            HorizontalCellSeperator seperator = new HorizontalCellSeperator ('-');
+            HorizontalCellSeparator separator = new HorizontalCellSeparator ('-');
             string expected = "--------";
-            seperator.Pad (8);
-            Assert.AreEqual (expected, seperator.Text);
+            separator.Pad (8);
+            Assert.AreEqual (expected, separator.Text);
+        }
+    }
+    
+    [TestFixture]
+    public class TestCell
+    {
+        [Test]
+        public void TestPad ()
+        {
+            string text = "xkcd";
+            ICell cell = new Cell (text);
+            cell.Pad (8);
+            Assert.AreEqual ("xkcd    ", cell.ToString ());
+            cell = new Cell (text, StringFormatting.RightJustified);
+            cell.Pad (8);
+            Assert.AreEqual ("    xkcd", cell.ToString ());
+            cell = new Cell (text, StringFormatting.Centered);
+            cell.Pad (8);
+            Assert.AreEqual ("  xkcd  ", cell.ToString ());
         }
     }
 }
