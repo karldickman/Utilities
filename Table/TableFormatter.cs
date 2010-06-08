@@ -1,5 +1,7 @@
+using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using TextFormat.Table.Exceptions;
 
 namespace TextFormat.Table
 {
@@ -191,6 +193,10 @@ namespace TextFormat.Table
             Alignment[] alignments)
         {
             IList<Row> rows = FormatRows (values, alignments);
+            if (rows.Count == 0)
+            {
+                return new List<string> ();
+            }
             return new Table(rows, DefaultMaxWidths(rows[0].ColumnCount)).Lines();
         }
         
@@ -210,8 +216,45 @@ namespace TextFormat.Table
         protected internal IList<Row> FormatRows(IList<object[]> values,
             Alignment[] alignments)
         {
+            int columnCount;
+            if(values.Count == 0)
+            {
+                columnCount = 1;
+            }
+            else
+            {
+                columnCount = values[0].Length;
+            }
+            foreach(object[] row in values)
+            {
+                if(row.Length != columnCount)
+                {
+                    throw new DimensionMismatchException();
+                }
+            }
+            return FormatRows(values, alignments, columnCount);
+        }
+        
+        /// <summary>
+        /// Format a list of objects into a table, using a special alignment for
+        /// each column.
+        /// </summary>
+        /// <param name="values">
+        /// A <see cref="IList<System.Object[]>"/> to be formatted into a table.
+        /// </param>
+        /// <param name="alignments">
+        /// A <see cref="Alignment[]"/>.  The alignments for each column.
+        /// </param>
+        /// <param name="columnCount">
+        /// The number of columns in the table.
+        /// </param>
+        /// <returns>
+        /// A <see cref="IList<Row>"/> of rows in the table.
+        /// </returns>
+        protected internal IList<Row> FormatRows(IList<object[]> values,
+            Alignment[] alignments, int columnCount)
+        {
             IList<Row> rows = new List<Row>();
-            int columnCount = values[0].Length;
             if(TopBorder != '\0')
             {
                 rows.Add(RowSeparatorFactory.MakeInstance(TopBorder, columnCount));
@@ -225,6 +268,39 @@ namespace TextFormat.Table
                 rows.Add(RowSeparatorFactory.MakeInstance(BottomBorder, columnCount));
             }
             return rows;
+        }
+    }
+    
+    [TestFixture]
+    public class TestTableFormatter
+    {
+        protected internal TableFormatter Formatter { get; set; }
+        protected internal TableFormatter FormatterT { get; set; }
+        protected internal TableFormatter FormatterB { get; set; }
+        protected internal TableFormatter FormatterTB { get; set; }
+        
+        [SetUp]
+        public void SetUp ()
+        {
+            Formatter = new TableFormatter ();
+            FormatterT = new TableFormatter ('\0', ' ', '\0', '-', '\0', '+');
+            FormatterB = new TableFormatter ('\0', ' ', '\0', '\0', '-', '+');
+            FormatterTB = new TableFormatter ('\0', ' ', '\0', '-');
+        }
+        
+        [Test]
+        public void TestFormat ()
+        {
+            IList<object[]> empty = new List<object[]> ();
+            IList<string> actual;
+            actual = Formatter.Format (empty);
+            Assert.AreEqual (0, actual.Count);
+            actual = FormatterT.Format (empty);
+            Assert.AreEqual (1, actual.Count);
+            actual = FormatterB.Format (empty);
+            Assert.AreEqual (1, actual.Count);
+            actual = FormatterTB.Format (empty);
+            Assert.AreEqual (2, actual.Count);
         }
     }
 }
