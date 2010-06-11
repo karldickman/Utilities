@@ -1,44 +1,35 @@
 using System;
+using System.Runtime.Serialization;
 
 namespace TextFormat
 {
 	/// <summary>
     /// The base exception from which all exceptions derive.
     /// </summary>
-	public class FormattingException : Exception
+	public class TextFormatException : Exception
 	{
-        public FormattingException () : base() {}
-		public FormattingException (string message) : base(message)	{}
-	}
+        public TextFormatException () : base() {}
+		public TextFormatException (string message) : base(message)	{}
+        public TextFormatException(string message, Exception exception)
+        : base(message, exception) {}
+        protected TextFormatException(SerializationInfo info,
+            StreamingContext context) : base(info, context) {}
+    }
 	
-    namespace Table.Exceptions
+    namespace Table
     {
         /// <summary>
         /// Two arrays or lists that should be the same length are not.
         /// </summary>
-        public class DimensionMismatchException : FormattingException
+        public class DimensionMismatchException : TextFormatException
         {
             public DimensionMismatchException () : base() {}
             public DimensionMismatchException (string message)
             : base(message) {}
-        }
-        
-        /// <summary>
-        /// The description of used to create table was invalid.
-        /// </summary>
-    	public class InvalidTableException : FormattingException
-    	{
-            public InvalidTableException () : base() {}
-    		public InvalidTableException (string message) : base(message) {}
-    	}
-        
-        /// <summary>
-        /// The description used to create a row was invalid.
-        /// </summary>
-        public class InvalidRowException : FormattingException
-        {
-            public InvalidRowException() : base() {}
-            public InvalidRowException(string message) : base(message) {}
+            public DimensionMismatchException (string message,
+                Exception exception) : base(message, exception) {}
+            protected DimensionMismatchException(SerializationInfo info,
+                StreamingContext context) : base(info, context) {}
         }
     }
 }

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using TextFormat.Table.Exceptions;
 
 namespace TextFormat.Table
 {
@@ -12,31 +11,31 @@ namespace TextFormat.Table
         /// <summary>
         /// The cells in the row.
         /// </summary>
-        protected internal ICell[] Cells { get; set; }
+        protected internal IList<ICell> Cells { get; set; }
         
         /// <summary>
         /// The separators between the cells.
         /// </summary>
-        protected internal char[] Separators { get; set; }
+        protected internal IList<char> Separators { get; set; }
         
         /// <summary>
         /// The number of columns in the table.
         /// </summary>
         public int ColumnCount
         {
-            get { return Cells.Length; }
+            get { return Cells.Count; }
         }
       
         /// <summary>
         /// Create a new row.
         /// </summary>
         /// <param name="cells">
-        /// A <see cref="ICell[]"/>.  The cells in the row.
+        /// A <see cref="IList<ICell>"/>.  The cells in the row.
         /// </param>
         /// <param name="separators">
         /// A <see cref="System.Char[]"/>.  The separators between the cells.
         /// </param>
-        protected internal Row (ICell[] cells, char[] separators)
+        protected internal Row (IList<ICell> cells, IList<char> separators)
         {
             Cells = cells;
             Separators = separators;
@@ -53,13 +52,17 @@ namespace TextFormat.Table
         /// <summary>
         /// Pad all cells in the row to the given widths.
         /// </summary>
-        public void Pad (int[] widths)
+        /// <exception cname="DimensionMismatchException">
+        /// Raised when an incorrect number of width is provided for the cells
+        /// in the row.
+        /// </exception>
+        public void Pad (IList<int> widths)
         {
-            if (Cells.Length != widths.Length)
+            if (Cells.Count != widths.Count)
             {
                 throw (new DimensionMismatchException ());
             }
-            for (int i = 0; i < Cells.Length; i++)
+            for (int i = 0; i < Cells.Count; i++)
             {
                 Cells[i].Pad (widths[i]);
             }
@@ -72,7 +75,7 @@ namespace TextFormat.Table
         {
             int i;
             string result = "";
-            for (i = 0; i < Cells.Length; i++)
+            for (i = 0; i < Cells.Count; i++)
             {
                 if (Separators[i] != '\0')
                 {

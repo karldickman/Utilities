@@ -1,7 +1,7 @@
 using NUnit.Framework;
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using TextFormat.Table.Exceptions;
 
 namespace TextFormat.Table
 {
@@ -152,12 +152,12 @@ namespace TextFormat.Table
         /// The default maximum width must be as large as possible so that
         /// normal values are less than the default.
         /// </summary>
-        protected internal static int[] DefaultMaxWidths(int size)
+        protected internal static IList<int> DefaultMaxWidths(int size)
         {
-            int[] maxWidths = new int[size];
+            IList<int> maxWidths = new List<int>();
             for (int i = 0; i < size; i++)
             {
-                maxWidths[i] = int.MaxValue;
+                maxWidths.Add(int.MaxValue);
             }
             return maxWidths;
         }
@@ -171,7 +171,7 @@ namespace TextFormat.Table
         /// <returns>
         /// A <see cref="IList<System.String>"/> of rows in the table.
         /// </returns>
-        public IList<string> Format (IList<object[]> values)
+        public IList<string> Format (IList<IList> values)
         {
             return Format (values, null);
         }
@@ -184,13 +184,13 @@ namespace TextFormat.Table
         /// A <see cref="IList<System.Object[]>"/> to be formatted into a table.
         /// </param>
         /// <param name="alignments">
-        /// A <see cref="Alignment[]"/>.  The alignments for each column.
+        /// A <see cref="IList<Alignment>"/>.  The alignments for each column.
         /// </param>
         /// <returns>
         /// A <see cref="IList<System.String>"/> of rows in the table.
         /// </returns>
-        public IList<string> Format (IList<object[]> values,
-            Alignment[] alignments)
+        public IList<string> Format (IList<IList> values,
+            IList<Alignment> alignments)
         {
             IList<Row> rows = FormatRows (values, alignments);
             if (rows.Count == 0)
@@ -208,13 +208,13 @@ namespace TextFormat.Table
         /// A <see cref="IList<System.Object[]>"/> to be formatted into a table.
         /// </param>
         /// <param name="alignments">
-        /// A <see cref="Alignment[]"/>.  The alignments for each column.
+        /// A <see cref="IList<Alignment>"/>.  The alignments for each column.
         /// </param>
         /// <returns>
         /// A <see cref="IList<Row>"/> of rows in the table.
         /// </returns>
-        protected internal IList<Row> FormatRows(IList<object[]> values,
-            Alignment[] alignments)
+        protected internal IList<Row> FormatRows(IList<IList> values,
+            IList<Alignment> alignments)
         {
             int columnCount;
             if(values.Count == 0)
@@ -223,11 +223,11 @@ namespace TextFormat.Table
             }
             else
             {
-                columnCount = values[0].Length;
+                columnCount = values[0].Count;
             }
-            foreach(object[] row in values)
+            foreach(IList row in values)
             {
-                if(row.Length != columnCount)
+                if(row.Count != columnCount)
                 {
                     throw new DimensionMismatchException();
                 }
@@ -243,7 +243,7 @@ namespace TextFormat.Table
         /// A <see cref="IList<System.Object[]>"/> to be formatted into a table.
         /// </param>
         /// <param name="alignments">
-        /// A <see cref="Alignment[]"/>.  The alignments for each column.
+        /// A <see cref="IList<Alignment>"/>.  The alignments for each column.
         /// </param>
         /// <param name="columnCount">
         /// The number of columns in the table.
@@ -251,15 +251,15 @@ namespace TextFormat.Table
         /// <returns>
         /// A <see cref="IList<Row>"/> of rows in the table.
         /// </returns>
-        protected internal IList<Row> FormatRows(IList<object[]> values,
-            Alignment[] alignments, int columnCount)
+        protected internal IList<Row> FormatRows(IList<IList> values,
+            IList<Alignment> alignments, int columnCount)
         {
             IList<Row> rows = new List<Row>();
             if(TopBorder != '\0')
             {
                 rows.Add(RowSeparatorFactory.MakeInstance(TopBorder, columnCount));
             }
-            foreach(object[] valueRow in values)
+            foreach(IList valueRow in values)
             {
                 rows.Add (RowFactory.MakeInstance (valueRow, alignments));
             }
@@ -291,7 +291,7 @@ namespace TextFormat.Table
         [Test]
         public void TestFormat ()
         {
-            IList<object[]> empty = new List<object[]> ();
+            IList<IList> empty = new List<IList> ();
             IList<string> actual;
             actual = Formatter.Format (empty);
             Assert.AreEqual (0, actual.Count);

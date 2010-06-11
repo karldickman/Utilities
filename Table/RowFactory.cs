@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using System;
-using TextFormat.Table.Exceptions;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace TextFormat.Table
 {
@@ -78,7 +79,7 @@ namespace TextFormat.Table
         /// </summary>
         public Row MakeInstance (char rowSeparator, int columnCount)
         {
-            ICell[] cells = new HorizontalCellSeparator[columnCount];
+            IList<ICell> cells = new HorizontalCellSeparator[columnCount];
             for (int i = 0; i < columnCount; i++)
             {
                 cells[i] = new HorizontalCellSeparator (rowSeparator);
@@ -95,10 +96,10 @@ namespace TextFormat.Table
         /// <returns>
         /// A <see cref="Row"/> containing the given values.
         /// </returns>
-        public Row MakeInstance (object[] values)
+        public Row MakeInstance (IList values)
         {
-            ICell[] cells = new Cell[values.Length];
-            for (int i = 0; i < cells.Length; i++) {
+            IList<ICell> cells = new Cell[values.Count];
+            for (int i = 0; i < cells.Count; i++) {
                 cells[i] = new Cell (values[i]);
             }
             return MakeInstance (cells);
@@ -111,20 +112,20 @@ namespace TextFormat.Table
         /// A <see cref="System.Object[]"/>.  The values in the cells.
         /// </param>
         /// <param name="alignments">
-        /// A <see cref="Alignment[]"/>.  The alignments of the cells.  Must be
+        /// A <see cref="IList<Alignment>"/>.  The alignments of the cells.  Must be
         /// the same size as values.
         /// </param>
         /// <returns>
         /// A <see cref="Row"/> containing the given values.
         /// </returns>
-        public Row MakeInstance (object[] values, Alignment[] alignments)
+        public Row MakeInstance (IList values, IList<Alignment> alignments)
         {
             if (alignments == null) 
             {
-               return MakeInstance (values);
+                return MakeInstance (values);
             }
-            ICell[] cells = new Cell[values.Length];
-            for (int i = 0; i < cells.Length; i++)
+            IList<ICell> cells = new Cell[values.Count];
+            for (int i = 0; i < cells.Count; i++)
             {
                 cells[i] = new Cell (values[i], alignments[i]);
             }
@@ -135,14 +136,14 @@ namespace TextFormat.Table
         /// Make a new row of cells.
         /// </summary>
         /// <param name="cells">
-        /// A <see cref="ICell[]"/>.  The cells in the row.
+        /// A <see cref="IList<ICell>"/>.  The cells in the row.
         /// </param>
         /// <returns>
         /// A <see cref="Row"/> containing the given cells.
         /// </returns>
-        public Row MakeInstance (ICell[] cells)
+        public Row MakeInstance (IList<ICell> cells)
         {
-            return new Row (cells, Separators (cells.Length));
+            return new Row (cells, Separators (cells.Count));
         }
         
         /// <summary>

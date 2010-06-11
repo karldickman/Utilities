@@ -1,7 +1,7 @@
 using NUnit.Framework;
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using TextFormat.Table.Exceptions;
 
 namespace TextFormat.Table
 {    
@@ -59,24 +59,66 @@ namespace TextFormat.Table
             TopBorder = topBorder;
         }
         
-        new public IList<string> Format (IList<object[]> values)
+        /// <summary>
+        /// Format some objects into a table.
+        /// </summary>
+        /// <param name="values">
+        /// A <see cref="IList<System.Object[]>"/> of values in the table.
+        /// </param>
+        /// <returns>
+        /// A <see cref="IList<System.String>"/> of rows in the table.
+        /// </returns>
+        /// <exception cref="DimensionMismatchException">
+        /// Thrown when any of the rows has the wrong number of cells.
+        /// </exception>
+        new public IList<string> Format (IList<IList> values)
         {
             return Format (values, null);
         }
         
-        new public IList<string> Format (IList<object[]> values,
-            Alignment[] alignments)
+        /// <summary>
+        /// Format some objects into a table.
+        /// </summary>
+        /// <param name="values">
+        /// A <see cref="IList<System.Object[]>"/> of values in the table.
+        /// </param>
+        /// <param name="alignments">
+        /// A <see cref="IList<Alignment>"/> of alignments in the table.
+        /// </param>
+        /// <returns>
+        /// A <see cref="IList<System.String>"/> of rows in the table.
+        /// </returns>
+        /// <exception cref="DimensionMismatchException">
+        /// Thrown when any of the rows has the wrong number of cells.
+        /// </exception>
+        new public IList<string> Format (IList<IList> values,
+            IList<Alignment> alignments)
         {
             return Format (null, values, alignments);
         }
         
-        public IList<string> Format (object[] header, IList<object[]> values)
+        /// <summary>
+        /// Format some objects into a table.
+        /// </summary>
+        /// <param name="header">
+        /// A <see cref="System.Object[]"/>.  The heading of the table.
+        /// </param>
+        /// <param name="values">
+        /// A <see cref="IList<System.Object[]>"/> of values in the table.
+        /// </param>
+        /// <returns>
+        /// A <see cref="IList<System.String>"/> of rows in the table.
+        /// </returns>
+        /// <exception cref="DimensionMismatchException">
+        /// Thrown when any of the rows has the wrong number of cells.
+        /// </exception>
+        public IList<string> Format (IList header, IList<IList> values)
         {
-            return Format (header, values, null);
+            return Format (header, values, (IList)null);
         }
         
         /// <summary>
-        /// Format the objects into a table.
+        /// Format some objects into a table.
         /// </summary>
         /// <param name="header">
         /// A <see cref="System.Object[]"/>.  The heading of the table.
@@ -85,19 +127,22 @@ namespace TextFormat.Table
         /// A <see cref="IList<System.Object[]>"/> of values in the table.
         /// </param>
         /// <param name="alignments">
-        /// A <see cref="Alignment[]"/>.  The alignments of the columns.
+        /// A <see cref="IList<Alignment>"/>.  The alignments of the columns.
         /// </param>
         /// <returns>
         /// A <see cref="IList<System.String>"/> of rows in the table.
         /// </returns>
-        public IList<string> Format (object[] header, IList<object[]> values,
-            Alignment[] alignments)
+        /// <exception cref="DimensionMismatchException">
+        /// Thrown when any of the rows has the wrong number of cells.
+        /// </exception>
+        public IList<string> Format (IList header, IList<IList> values,
+            IList<Alignment> alignments)
         {
             return Format (header, values, null, alignments);
         }
         
         /// <summary>
-        /// Format the objects into a table.
+        /// Format some objects into a table.
         /// </summary>
         /// <param name="header">
         /// A <see cref="System.Object[]"/>.  The heading of the table.
@@ -111,14 +156,17 @@ namespace TextFormat.Table
         /// <returns>
         /// A <see cref="IList<System.String>"/> of rows in the table.
         /// </returns>
-        public IList<string> Format (object[] header, IList<object[]> values,
-            object[] footer)
+        /// <exception cref="DimensionMismatchException">
+        /// Thrown when any of the rows has the wrong number of cells.
+        /// </exception>
+        public IList<string> Format (IList header, IList<IList> values,
+            IList footer)
         {
             return Format (header, values, footer, null);
         }
         
         /// <summary>
-        /// Format the objects into a table.
+        /// Format some objects into a table.
         /// </summary>
         /// <param name="header">
         /// A <see cref="System.Object[]"/>.  The heading of the table.
@@ -130,13 +178,16 @@ namespace TextFormat.Table
         /// A <see cref="System.Object[]"/>.  The footer of the table.
         /// </param>
         /// <param name="alignments">
-        /// A <see cref="Alignment[]"/>.  The alignments in the table.
+        /// A <see cref="IList<Alignment>"/>.  The alignments in the table.
         /// </param>
         /// <returns>
         /// A <see cref="IList<System.String>"/> of rows in the table.
         /// </returns>
-        public IList<string> Format (object[] header, IList<object[]> values,
-            object[] footer, Alignment[] alignments)
+        /// <exception cref="DimensionMismatchException">
+        /// Thrown when any of the rows has the wrong number of cells.
+        /// </exception>
+        public IList<string> Format (IList header, IList<IList> values,
+            IList footer, IList<Alignment> alignments)
         {
             IList<Row> rows = FormatRows (header, values, footer, alignments);
             if (rows.Count == 0)
@@ -148,7 +199,7 @@ namespace TextFormat.Table
         }
         
         /// <summary>
-        /// Format the objects into a table.
+        /// Format some objects into a table.
         /// </summary>
         /// <param name="header">
         /// A <see cref="System.Object[]"/>.  The heading of the table.
@@ -160,34 +211,38 @@ namespace TextFormat.Table
         /// A <see cref="System.Object[]"/>.  The footer of the table.
         /// </param>
         /// <param name="alignments">
-        /// A <see cref="Alignment[]"/>.  The alignments in the table.
+        /// A <see cref="IList<Alignment>"/>.  The alignments in the table.
         /// </param>
         /// <returns>
         /// A <see cref="IList<Row>"/> of rows in the table.
         /// </returns>
-        protected internal IList<Row> FormatRows (object[] header,
-            IList<object[]> values, object[] footer, Alignment[] alignments)
+        /// <exception cref="DimensionMismatchException">
+        /// Thrown when any of the rows has the wrong number of cells.
+        /// </exception>
+        protected internal IList<Row> FormatRows (IList header,
+            IList<IList> values, IList footer,
+            IList<Alignment> alignments)
         {
             int columnCount;
             //Get the number of columns
             if(header != null)
             {
-                columnCount = header.Length;
+                columnCount = header.Count;
             }
             else if(footer != null)
             {
-                columnCount = footer.Length;
+                columnCount = footer.Count;
             }
             else if(values.Count > 0)
             {
-                columnCount = values[0].Length;
+                columnCount = values[0].Count;
             }
             else
             {
                 return new List<Row>();
             }
-            if(header != null && header.Length != columnCount
-                || footer != null && footer.Length != columnCount)
+            if(header != null && header.Count != columnCount
+                || footer != null && footer.Count != columnCount)
             {
                 throw new DimensionMismatchException();
             }
@@ -195,7 +250,7 @@ namespace TextFormat.Table
         }
                 
         /// <summary>
-        /// Format the objects into a table.
+        /// Format some objects into a table.
         /// </summary>
         /// <param name="header">
         /// A <see cref="System.Object[]"/>.  The heading of the table.
@@ -207,7 +262,7 @@ namespace TextFormat.Table
         /// A <see cref="System.Object[]"/>.  The footer of the table.
         /// </param>
         /// <param name="alignments">
-        /// A <see cref="Alignment[]"/>.  The alignments in the table.
+        /// A <see cref="IList<Alignment>"/>.  The alignments in the table.
         /// </param>
         /// <param name="columnCount">
         /// A <see cref="System.Int32"/>
@@ -215,12 +270,13 @@ namespace TextFormat.Table
         /// <returns>
         /// A <see cref="IList<Row>"/> of rows in the table.
         /// </returns>
-        protected internal IList<Row> FormatRows(object[] header,
-            IList<object[]> values, object[] footer, Alignment[] alignments,
-            int columnCount)
+        protected internal IList<Row> FormatRows(IList header,
+            IList<IList> values, IList footer,
+            IList<Alignment> alignments, int columnCount)
         {
             List<Row> rows = new List<Row> ();
-            IList<Row> bodyRows = base.FormatRows (values, alignments, columnCount);
+            IList<Row> bodyRows = base.FormatRows (values, alignments,
+                columnCount);
             if (TopBorder != '\0')
             {
                 rows.Add (RowSeparatorFactory.MakeInstance (TopBorder,
@@ -277,8 +333,10 @@ namespace TextFormat.Table
         [Test]
         public void TestFormat ()
         {
-            object[] label = { "thing", "stuff" };
-            IList<object[]> empty = new List<object[]> ();
+            IList label = new ArrayList ();
+            label.Add ("thing");
+            label.Add ("stuff");
+            IList<IList> empty = new List<IList> ();
             IList<string> actual;
             actual = Formatter.Format (empty);
             Assert.AreEqual (0, actual.Count);
@@ -290,7 +348,9 @@ namespace TextFormat.Table
             Assert.AreEqual (6, actual.Count);
             try
             {
-                actual = Formatter.Format (label, empty, new object[] { "xkcd" });
+                IList list = new ArrayList ();
+                list.Add ("xkcd");
+                actual = Formatter.Format (label, empty, list);
                 Assert.Fail ("Attempting to use different sized headers and footers should not be allowed.");
             }
             catch (DimensionMismatchException) {}

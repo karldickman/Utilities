@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using TextFormat.Table.Exceptions;
 
 namespace TextFormat.Table
 {
@@ -12,7 +11,7 @@ namespace TextFormat.Table
         /// <summary>
         /// The maximum widths of each column.
         /// </summary>
-        protected internal int[] MaxWidths { get; set; }
+        protected internal IList<int> MaxWidths { get; set; }
         
         /// <summary>
         /// The rows of teh table.
@@ -28,7 +27,7 @@ namespace TextFormat.Table
         /// <param name="maxWidths">
         /// A <see cref="System.Int32[]"/>.  The maximum widths of the columns.
         /// </param>
-        protected internal Table (IList<Row> rows, int[] maxWidths)
+        protected internal Table (IList<Row> rows, IList<int> maxWidths)
         {
             Rows = rows;
             MaxWidths = maxWidths;
@@ -38,10 +37,10 @@ namespace TextFormat.Table
         /// <summary>
         /// Get the widths of all the columns in the table.
         /// </summary>
-        public int[] ColumnWidths ()
+        public IList<int> ColumnWidths ()
         {
             int columnCount = Rows[0].ColumnCount, width;
-            int[] columnWidths = new int[columnCount];
+            IList<int> columnWidths = new int[columnCount];
             foreach (Row row in Rows)
             {
                 for (int i = 0; i < columnCount; i++)
@@ -74,7 +73,7 @@ namespace TextFormat.Table
         /// </summary>
         public void Pad ()
         {
-            int[] columnWidths = ColumnWidths ();
+            IList<int> columnWidths = ColumnWidths ();
             foreach (Row row in Rows)
             {
                 row.Pad (columnWidths);
