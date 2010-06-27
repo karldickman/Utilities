@@ -213,6 +213,9 @@ namespace TextFormat.Table
         /// <returns>
         /// A <see cref="IList<Row>"/> of rows in the table.
         /// </returns>
+        /// <exception cref="ArgumentException">
+        /// Thrown when the number of columns is unequal.
+        /// </exception>
         protected internal IList<Row> FormatRows(IList<IList> values,
             IList<Alignment> alignments)
         {
@@ -229,7 +232,9 @@ namespace TextFormat.Table
             {
                 if(row.Count != columnCount)
                 {
-                    throw new DimensionMismatchException();
+                    throw new ArgumentException(
+                        "The number of cells in the row must match the " +
+                        "declared number of columns.");
                 }
             }
             return FormatRows(values, alignments, columnCount);

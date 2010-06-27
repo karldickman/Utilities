@@ -244,7 +244,7 @@ namespace TextFormat.Table
             if(header != null && header.Count != columnCount
                 || footer != null && footer.Count != columnCount)
             {
-                throw new DimensionMismatchException();
+                throw new ArgumentException("All column counts must be equal.");
             }
             return FormatRows(header, values, footer, alignments, columnCount);
         }
@@ -353,7 +353,7 @@ namespace TextFormat.Table
                 actual = Formatter.Format (label, empty, list);
                 Assert.Fail ("Attempting to use different sized headers and footers should not be allowed.");
             }
-            catch (DimensionMismatchException) {}
+            catch (ArgumentException) {}
         }
     }
 }

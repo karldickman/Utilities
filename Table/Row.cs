@@ -52,7 +52,7 @@ namespace TextFormat.Table
         /// <summary>
         /// Pad all cells in the row to the given widths.
         /// </summary>
-        /// <exception cname="DimensionMismatchException">
+        /// <exception cname="ArgumentException">
         /// Raised when an incorrect number of width is provided for the cells
         /// in the row.
         /// </exception>
@@ -60,7 +60,8 @@ namespace TextFormat.Table
         {
             if (Cells.Count != widths.Count)
             {
-                throw (new DimensionMismatchException ());
+                throw new ArgumentException (
+                    "The number of cells must match the nubmer of widths.");
             }
             for (int i = 0; i < Cells.Count; i++)
             {
