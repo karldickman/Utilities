@@ -1,18 +1,18 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-
+using Ngol.Utilities.TextFormat.Table;
 using NUnit.Framework;
 
-namespace TextFormat.Table
+namespace Ngol.Utilitities.TextFormat.Table.Tests
 {        
     [TestFixture]
     public class TestTableFormatter
     {
-        protected internal TableFormatter Formatter { get; set; }
-        protected internal TableFormatter FormatterT { get; set; }
-        protected internal TableFormatter FormatterB { get; set; }
-        protected internal TableFormatter FormatterTB { get; set; }
+        protected TableFormatter Formatter { get; set; }
+        protected TableFormatter FormatterT { get; set; }
+        protected TableFormatter FormatterB { get; set; }
+        protected TableFormatter FormatterTB { get; set; }
         
         [SetUp]
         public void SetUp ()

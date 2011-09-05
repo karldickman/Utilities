@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace TextFormat.Table
+namespace Ngol.Utilities.TextFormat.Table
 {
     /// <summary>
     /// A factory for creating rows.
@@ -108,10 +108,10 @@ namespace TextFormat.Table
         /// Make a new row of cells.
         /// </summary>
         /// <param name="values">
-        /// A <see cref="System.Object[]"/>.  The values in the cells.
+        /// The values in the cells.
         /// </param>
         /// <param name="alignments">
-        /// A <see cref="IList<Alignment>"/>.  The alignments of the cells.  Must be
+        /// The alignments of the cells.  Must be
         /// the same size as values.
         /// </param>
         /// <returns>
@@ -135,7 +135,7 @@ namespace TextFormat.Table
         /// Make a new row of cells.
         /// </summary>
         /// <param name="cells">
-        /// A <see cref="IList<ICell>"/>.  The cells in the row.
+        /// The cells in the row.
         /// </param>
         /// <returns>
         /// A <see cref="Row"/> containing the given cells.

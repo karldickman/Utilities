@@ -1,52 +1,70 @@
 using System;
 using System.Collections.Generic;
 
-namespace TextFormat.Table
+namespace Ngol.Utilities.TextFormat.Table
 {
     /// <summary>
     /// A representation of a table, consisting of a bunch of rows of cells.
     /// </summary>
     public class Table
     {
+        #region Properties
+
         /// <summary>
         /// The maximum widths of each column.
         /// </summary>
-        protected internal IList<int> MaxWidths { get; set; }
-        
+        protected IList<int> MaxWidths
+        {
+            get;
+            set;
+        }
+
         /// <summary>
         /// The rows of teh table.
         /// </summary>
-        protected internal IList<Row> Rows { get; set; }
-        
+        protected IList<Row> Rows
+        {
+            get;
+            set;
+        }
+
+        #endregion
+
+        #region Constructors
+
         /// <summary>
         /// Create a new table.
         /// </summary>
         /// <param name="rows">
-        /// A <see cref="IList<Row>"/> of the rows in the table.
+        /// A sequence of the rows in the table.
         /// </param>
         /// <param name="maxWidths">
-        /// A <see cref="System.Int32[]"/>.  The maximum widths of the columns.
+        /// The maximum widths of the columns.
         /// </param>
-        protected internal Table (IList<Row> rows, IList<int> maxWidths)
+        public Table(IList<Row> rows, IList<int> maxWidths)
         {
             Rows = rows;
             MaxWidths = maxWidths;
             Pad();
         }
-        
+
+        #endregion
+
+        #region Methods
+
         /// <summary>
         /// Get the widths of all the columns in the table.
         /// </summary>
-        public IList<int> ColumnWidths ()
+        public IList<int> ColumnWidths()
         {
             int columnCount = Rows[0].ColumnCount, width;
             IList<int> columnWidths = new int[columnCount];
-            foreach (Row row in Rows)
+            foreach(Row row in Rows)
             {
-                for (int i = 0; i < columnCount; i++)
+                for(int i = 0; i < columnCount; i++)
                 {
-                    width = row.ColumnWidth (i);
-                    if (width > columnWidths[i] && width < MaxWidths[i])
+                    width = row.ColumnWidth(i);
+                    if(width > columnWidths[i] && width < MaxWidths[i])
                     {
                         columnWidths[i] = width;
                     }
@@ -54,30 +72,32 @@ namespace TextFormat.Table
             }
             return columnWidths;
         }
-        
+
         /// <summary>
         /// Get all the physical lines in a string representation of the table.
         /// </summary>
-        public IList<string> Lines ()
+        public IList<string> Lines()
         {
-            IList<string> lines = new List<string> ();
-            foreach (Row row in Rows)
+            IList<string> lines = new List<string>();
+            foreach(Row row in Rows)
             {
-                lines.Add (row.ToString ());
+                lines.Add(row.ToString());
             }
             return lines;
         }
-        
+
         /// <summary>
         /// Pad all cells of the table to the width of their containing rows.
         /// </summary>
-        public void Pad ()
+        public void Pad()
         {
-            IList<int> columnWidths = ColumnWidths ();
-            foreach (Row row in Rows)
+            IList<int> columnWidths = ColumnWidths();
+            foreach(Row row in Rows)
             {
-                row.Pad (columnWidths);
+                row.Pad(columnWidths);
             }
         }
+
+        #endregion
     }
 }

@@ -1,6 +1,6 @@
 using System;
 
-namespace TextFormat
+namespace Ngol.Utilities.TextFormat.Table
 {
     /// <summary>
     /// The interface that all cells of the table must implement.
@@ -8,13 +8,13 @@ namespace TextFormat
     public interface ICell
     {
         /// <summary>
-        /// Returns the cell padded to the given width.
-        /// </summary>
-        void Pad (int width);
-
-        /// <summary>
         /// Get the width required for the data in the cell.
         /// </summary>
-        int Width ();
+        int GetWidth();
+
+        /// <summary>
+        /// Returns the cell padded to the given width.
+        /// </summary>
+        void Pad(int width);
     }
 }

@@ -1,6 +1,6 @@
 using System;
 
-namespace Ngol.Utilities.Collections
+namespace Ngol.Utilities.Collections.Extensions
 {
     /// <summary>
     /// Helper class for generating instances of NumberedEntry&lt;T&gt;.

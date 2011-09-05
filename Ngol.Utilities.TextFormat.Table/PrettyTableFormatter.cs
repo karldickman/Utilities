@@ -1,6 +1,6 @@
 using System;
 
-namespace TextFormat.Table
+namespace Ngol.Utilities.TextFormat.Table
 {
     /// <summary>
     /// A formatter that produces standard ASCII tables.

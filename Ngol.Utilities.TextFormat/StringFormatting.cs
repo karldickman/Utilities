@@ -1,6 +1,6 @@
 using System;
 
-namespace TextFormat
+namespace Ngol.Utilities.TextFormat
 {
     /// <summary>
     /// A function that aligns a string, and forces it to a specified width.
@@ -145,7 +145,7 @@ namespace TextFormat
         /// A <see cref="System.String"/>.  If the value is wider than width,
         /// the value is truncated.
         /// </returns>
-        protected internal static string Justified(object toJustify, int width,
+        protected static string Justified(object toJustify, int width,
             bool left)
         {
             string result = Padded(toJustify, width, left);
@@ -173,7 +173,7 @@ namespace TextFormat
         /// A <see cref="System.String"/>.  If the value is wider than width,
         /// this is the same as toPad.ToString().
         /// </returns>
-        protected internal static string Padded(object toPad, int width,
+        protected static string Padded(object toPad, int width,
             bool left)
         {
             if(toPad == null)
@@ -200,7 +200,7 @@ namespace TextFormat
         /// <returns>
         /// A <see cref="System.Int32"/>.
         /// </returns>
-        protected internal static int SpacesBefore(int wordLength, int width)
+        protected static int SpacesBefore(int wordLength, int width)
         {
             return (width - wordLength) / 2;
         }

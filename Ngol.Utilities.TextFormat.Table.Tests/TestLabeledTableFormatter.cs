@@ -1,15 +1,15 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-
+using Ngol.Utilities.TextFormat.Table;
 using NUnit.Framework;
 
-namespace TextFormat.Table
+namespace Ngol.Utilitities.TextFormat.Table.Tests
 { 
     [TestFixture]
     public class TestLabeledTableFormatter
     {
-        protected internal LabeledTableFormatter Formatter { get; set; }
+        protected LabeledTableFormatter Formatter { get; set; }
         [SetUp]
         public void TestSetUp ()
         {

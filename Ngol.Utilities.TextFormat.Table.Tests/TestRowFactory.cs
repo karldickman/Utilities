@@ -1,8 +1,8 @@
 using System;
-
 using NUnit.Framework;
+using Ngol.Utilities.TextFormat.Table;
 
-namespace TextFormat.Table
+namespace Ngol.Utilitities.TextFormat.Table.Tests
 {
     [TestFixture]
     public class TestRowFactory

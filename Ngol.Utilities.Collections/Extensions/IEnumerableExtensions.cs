@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using MoreLinq;
 
-namespace Ngol.Utilities.Collections
+namespace Ngol.Utilities.Collections.Extensions
 {
     /// <summary>
     /// Useful extensions on IEnumerable and IEnumerable&lt;T&gt;.

@@ -2,23 +2,15 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace TextFormat.Table
-{    
+namespace Ngol.Utilities.TextFormat.Table
+{
     /// <summary>
     /// A table formatter for tables with one-row headers and footers.
     /// </summary>
     public class LabeledTableFormatter : TableFormatter
     {
-        /// <summary>
-        /// The bottom border of the table.
-        /// </summary>
-        new protected internal char BottomBorder { get; set; }
-        
-        /// <summary>
-        /// The top border of the table.
-        /// </summary>
-        new protected internal char TopBorder { get; set; }
-        
+        #region Constructors
+
         /// <summary>
         /// Create a formatter that produces tables with lots of decoration.
         /// </summary>
@@ -48,179 +40,151 @@ namespace TextFormat.Table
         /// <param name="corner">
         /// The <see cref="System.Char"/> used at intersections of borders.
         /// </param>
-        public LabeledTableFormatter (char leftBorder, char columnSeparator,
-            char rightBorder, char topBorder, char bottomBorder, char bodyTop,
-            char bodyBottom, char corner)
-            : base(leftBorder, columnSeparator, rightBorder, bodyTop,
-                bodyBottom, corner)
+        public LabeledTableFormatter(char leftBorder, char columnSeparator, char rightBorder, char topBorder, char bottomBorder, char bodyTop, char bodyBottom, char corner) : base(leftBorder, columnSeparator, rightBorder, bodyTop, bodyBottom, corner)
         {
             BottomBorder = bottomBorder;
             TopBorder = topBorder;
         }
-        
+
+        #endregion
+
+        #region Methods
+
         /// <summary>
         /// Format some objects into a table.
         /// </summary>
         /// <param name="values">
-        /// A <see cref="IList<System.Object[]>"/> of values in the table.
+        /// The sequence of values in the table.
         /// </param>
-        /// <returns>
-        /// A <see cref="IList<System.String>"/> of rows in the table.
-        /// </returns>
-        /// <exception cref="DimensionMismatchException">
+        /// <exception cref="ArgumentException">
         /// Thrown when any of the rows has the wrong number of cells.
         /// </exception>
-        new public IList<string> Format (IList<IList> values)
+        public new IList<string> Format(IList<IList> values)
         {
-            return Format (values, null);
+            return Format(values, null);
         }
-        
+
         /// <summary>
         /// Format some objects into a table.
         /// </summary>
         /// <param name="values">
-        /// A <see cref="IList<System.Object[]>"/> of values in the table.
+        /// The sequence of values in the table.
         /// </param>
         /// <param name="alignments">
-        /// A <see cref="IList<Alignment>"/> of alignments in the table.
+        /// The sequence of alignments in the table.
         /// </param>
-        /// <returns>
-        /// A <see cref="IList<System.String>"/> of rows in the table.
-        /// </returns>
-        /// <exception cref="DimensionMismatchException">
+        /// <exception cref="ArgumentException">
         /// Thrown when any of the rows has the wrong number of cells.
         /// </exception>
-        new public IList<string> Format (IList<IList> values,
-            IList<Alignment> alignments)
+        public new IList<string> Format(IList<IList> values, IList<Alignment> alignments)
         {
-            return Format (null, values, alignments);
+            return Format(null, values, alignments);
         }
-        
+
         /// <summary>
         /// Format some objects into a table.
         /// </summary>
         /// <param name="header">
-        /// A <see cref="System.Object[]"/>.  The heading of the table.
+        /// The heading of the table.
         /// </param>
         /// <param name="values">
-        /// A <see cref="IList<System.Object[]>"/> of values in the table.
+        /// The sequence of values in the table.
         /// </param>
-        /// <returns>
-        /// A <see cref="IList<System.String>"/> of rows in the table.
-        /// </returns>
-        /// <exception cref="DimensionMismatchException">
+        /// <exception cref="ArgumentException">
         /// Thrown when any of the rows has the wrong number of cells.
         /// </exception>
-        public IList<string> Format (IList header, IList<IList> values)
+        public IList<string> Format(IList header, IList<IList> values)
         {
-            return Format (header, values, (IList)null);
+            return Format(header, values, (IList)null);
         }
-        
+
         /// <summary>
         /// Format some objects into a table.
         /// </summary>
         /// <param name="header">
-        /// A <see cref="System.Object[]"/>.  The heading of the table.
+        /// The heading of the table.
         /// </param>
         /// <param name="values">
-        /// A <see cref="IList<System.Object[]>"/> of values in the table.
+        /// The sequence of values in the table.
         /// </param>
         /// <param name="alignments">
-        /// A <see cref="IList<Alignment>"/>.  The alignments of the columns.
+        /// The alignments of the columns.
         /// </param>
-        /// <returns>
-        /// A <see cref="IList<System.String>"/> of rows in the table.
-        /// </returns>
-        /// <exception cref="DimensionMismatchException">
+        /// <exception cref="ArgumentException">
         /// Thrown when any of the rows has the wrong number of cells.
         /// </exception>
-        public IList<string> Format (IList header, IList<IList> values,
-            IList<Alignment> alignments)
+        public IList<string> Format(IList header, IList<IList> values, IList<Alignment> alignments)
         {
-            return Format (header, values, null, alignments);
+            return Format(header, values, null, alignments);
         }
-        
+
         /// <summary>
         /// Format some objects into a table.
         /// </summary>
         /// <param name="header">
-        /// A <see cref="System.Object[]"/>.  The heading of the table.
+        /// The heading of the table.
         /// </param>
         /// <param name="values">
-        /// A <see cref="IList<System.Object[]>"/> of values in the table.
+        /// The sequence of values in the table.
         /// </param>
         /// <param name="footer">
-        /// A <see cref="System.Object[]"/>.  The footer of the table.
+        /// The footer of the table.
         /// </param>
-        /// <returns>
-        /// A <see cref="IList<System.String>"/> of rows in the table.
-        /// </returns>
-        /// <exception cref="DimensionMismatchException">
+        /// <exception cref="ArgumentException">
         /// Thrown when any of the rows has the wrong number of cells.
         /// </exception>
-        public IList<string> Format (IList header, IList<IList> values,
-            IList footer)
+        public IList<string> Format(IList header, IList<IList> values, IList footer)
         {
-            return Format (header, values, footer, null);
+            return Format(header, values, footer, null);
         }
-        
+
         /// <summary>
         /// Format some objects into a table.
         /// </summary>
         /// <param name="header">
-        /// A <see cref="System.Object[]"/>.  The heading of the table.
+        /// The heading of the table.
         /// </param>
         /// <param name="values">
-        /// A <see cref="IList<System.Object[]>"/> of values in teh table.
+        /// The sequence of values in teh table.
         /// </param>
         /// <param name="footer">
-        /// A <see cref="System.Object[]"/>.  The footer of the table.
+        /// The footer of the table.
         /// </param>
         /// <param name="alignments">
-        /// A <see cref="IList<Alignment>"/>.  The alignments in the table.
+        /// The alignments in the table.
         /// </param>
-        /// <returns>
-        /// A <see cref="IList<System.String>"/> of rows in the table.
-        /// </returns>
-        /// <exception cref="DimensionMismatchException">
+        /// <exception cref="ArgumentException">
         /// Thrown when any of the rows has the wrong number of cells.
         /// </exception>
-        public IList<string> Format (IList header, IList<IList> values,
-            IList footer, IList<Alignment> alignments)
+        public IList<string> Format(IList header, IList<IList> values, IList footer, IList<Alignment> alignments)
         {
-            IList<Row> rows = FormatRows (header, values, footer, alignments);
-            if (rows.Count == 0)
+            IList<Row> rows = FormatRows(header, values, footer, alignments);
+            if(rows.Count == 0)
             {
-                return new List<string> ();
+                return new List<string>();
             }
-            return new Table (rows,
-                DefaultMaxWidths (rows[0].ColumnCount)).Lines ();
+            return new Table(rows, GetDefaultMaxWidths(rows[0].ColumnCount)).Lines();
         }
-        
+
         /// <summary>
         /// Format some objects into a table.
         /// </summary>
         /// <param name="header">
-        /// A <see cref="System.Object[]"/>.  The heading of the table.
+        /// The heading of the table.
         /// </param>
         /// <param name="values">
-        /// A <see cref="IList<System.Object[]>"/> of values in teh table.
+        /// The sequence of values in teh table.
         /// </param>
         /// <param name="footer">
-        /// A <see cref="System.Object[]"/>.  The footer of the table.
+        /// The footer of the table.
         /// </param>
         /// <param name="alignments">
-        /// A <see cref="IList<Alignment>"/>.  The alignments in the table.
+        /// The alignments in the table.
         /// </param>
-        /// <returns>
-        /// A <see cref="IList<Row>"/> of rows in the table.
-        /// </returns>
-        /// <exception cref="DimensionMismatchException">
+        /// <exception cref="ArgumentException">
         /// Thrown when any of the rows has the wrong number of cells.
         /// </exception>
-        protected internal IList<Row> FormatRows (IList header,
-            IList<IList> values, IList footer,
-            IList<Alignment> alignments)
+        protected IList<Row> FormatRows(IList header, IList<IList> values, IList footer, IList<Alignment> alignments)
         {
             int columnCount;
             //Get the number of columns
@@ -228,6 +192,8 @@ namespace TextFormat.Table
             {
                 columnCount = header.Count;
             }
+
+
             else if(footer != null)
             {
                 columnCount = footer.Count;
@@ -240,70 +206,63 @@ namespace TextFormat.Table
             {
                 return new List<Row>();
             }
-            if(header != null && header.Count != columnCount
-                || footer != null && footer.Count != columnCount)
+            if(header != null && header.Count != columnCount || footer != null && footer.Count != columnCount)
             {
                 throw new ArgumentException("All column counts must be equal.");
             }
             return FormatRows(header, values, footer, alignments, columnCount);
         }
-                
+
         /// <summary>
         /// Format some objects into a table.
         /// </summary>
         /// <param name="header">
-        /// A <see cref="System.Object[]"/>.  The heading of the table.
+        /// The heading of the table.
         /// </param>
         /// <param name="values">
-        /// A <see cref="IList<System.Object[]>"/> of values in teh table.
+        /// The sequence of values in teh table.
         /// </param>
         /// <param name="footer">
-        /// A <see cref="System.Object[]"/>.  The footer of the table.
+        /// The footer of the table.
         /// </param>
         /// <param name="alignments">
-        /// A <see cref="IList<Alignment>"/>.  The alignments in the table.
+        /// The alignments in the table.
         /// </param>
         /// <param name="columnCount">
-        /// A <see cref="System.Int32"/>
+        /// The number of columns.
         /// </param>
-        /// <returns>
-        /// A <see cref="IList<Row>"/> of rows in the table.
-        /// </returns>
-        protected internal IList<Row> FormatRows(IList header,
-            IList<IList> values, IList footer,
-            IList<Alignment> alignments, int columnCount)
+        protected IList<Row> FormatRows(IList header, IList<IList> values, IList footer, IList<Alignment> alignments, int columnCount)
         {
-            List<Row> rows = new List<Row> ();
-            IList<Row> bodyRows = base.FormatRows (values, alignments,
-                columnCount);
-            if (TopBorder != '\0')
+            List<Row> rows = new List<Row>();
+            IList<Row> bodyRows = base.FormatRows(values, alignments, columnCount);
+            if(TopBorder != '\0')
             {
-                rows.Add (RowSeparatorFactory.MakeInstance (TopBorder,
-                        columnCount));
+                rows.Add(RowSeparatorFactory.MakeInstance(TopBorder, columnCount));
             }
-            if (header != null) 
+            if(header != null)
             {
-                rows.Add (RowFactory.MakeInstance (header));
+                rows.Add(RowFactory.MakeInstance(header));
             }
             else if(base.TopBorder != '\0')
             {
-                bodyRows.RemoveAt (0);
+                bodyRows.RemoveAt(0);
             }
             rows.AddRange(bodyRows);
-            if (footer != null)
+            if(footer != null)
             {
-                rows.Add (RowFactory.MakeInstance (footer));
+                rows.Add(RowFactory.MakeInstance(footer));
             }
             else if(base.BottomBorder != '\0')
             {
-                rows.RemoveAt (rows.Count - 1);
+                rows.RemoveAt(rows.Count - 1);
             }
-            if (BottomBorder != '\0')
+            if(BottomBorder != '\0')
             {
-                rows.Add (RowSeparatorFactory.MakeInstance (BottomBorder,
-                        columnCount));
+                rows.Add(RowSeparatorFactory.MakeInstance(BottomBorder, columnCount));
             }
             return rows;
         }
+        
+        #endregion
     }
 }
