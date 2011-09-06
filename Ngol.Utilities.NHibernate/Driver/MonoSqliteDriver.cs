@@ -36,7 +36,7 @@ namespace Ngol.Utilities.NHibernate.Driver
         /// Construct a new SQLite driver.
         /// </summary>
         public MonoSqliteDriver()
-            : base("Mono.DatalSqlite", "Mono.Data.Sqlite.SqliteConnection", "Mono.Data.Sqlite.SqliteCommand")
+            : base("Mono.Data.Sqlite", "Mono.Data.Sqlite.SqliteConnection", "Mono.Data.Sqlite.SqliteCommand")
         {
         }
     }
