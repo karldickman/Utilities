@@ -47,4 +47,14 @@
     <Compile Include="TestStringFormatting.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <ProjectReference Include="..\Ngol.Utilities.Reflection\Ngol.Utilities.Reflection.csproj">
+      <Project>{8F46EFD3-2D0F-4DE1-9CBB-E775E2A2458A}</Project>
+      <Name>Ngol.Utilities.Reflection</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Ngol.Utilities.TextFormat\Ngol.Utilities.TextFormat.csproj">
+      <Project>{C596C8BD-7CA7-4E11-9969-D0CCB140A64B}</Project>
+      <Name>Ngol.Utilities.TextFormat</Name>
+    </ProjectReference>
+  </ItemGroup>
 </Project>

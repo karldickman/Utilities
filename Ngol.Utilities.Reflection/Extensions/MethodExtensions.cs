@@ -1,23 +1,14 @@
 using System;
 using System.Reflection;
+using Ngol.Utilities.Reflection;
 
-namespace Ngol.Utilities.Reflection
+namespace Ngol.Utilities.Reflection.Extensions
 {
     /// <summary>
     /// Useful extensions for working with methods.
     /// </summary>
-    public static class MethodUtilities
+    public static class MethodExtensions
     {
-        /// <summary>
-        /// The <see cref="BindingFlags" /> used to find an instance method.
-        /// </summary>
-        private static readonly BindingFlags InstanceFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
-
-        /// <summary>
-        /// The <see cref="BindingFlags" /> used to find a static method.
-        /// </summary>
-        private static readonly BindingFlags StaticFlags = BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
-
         /// <summary>
         /// Invoke a method on an instance.
         /// </summary>
@@ -99,7 +90,7 @@ namespace Ngol.Utilities.Reflection
         {
             if(instance == null)
                 throw new ArgumentNullException("instance");
-            return InvokeMethod(instance, type, methodName, arguments, InstanceFlags);
+            return InvokeMethod(instance, type, methodName, arguments, CommonBindingFlags.InstanceFlags);
         }
 
         /// <summary>
@@ -165,7 +156,7 @@ namespace Ngol.Utilities.Reflection
         /// </returns>
         public static object InvokeMethod(this Type type, string methodName, params object[] arguments)
         {
-            return InvokeMethod(null, type, methodName, arguments, StaticFlags);
+            return InvokeMethod(null, type, methodName, arguments, CommonBindingFlags.StaticFlags);
         }
 
         /// <summary>
@@ -203,7 +194,7 @@ namespace Ngol.Utilities.Reflection
         /// </list>
         /// </exception>
         /// <exception cref="ArgumentNullException">
-        /// Thrown if <paramref name="methodName"/> is <see langword="null" />.
+        /// Thrown if <paramref name="methodName"/> or <paramref name="type"/> is <see langword="null" />.
         /// </exception>
         /// <exception cref="InvalidOperationException">
         /// The type that decalres the method is an open generic type.
@@ -235,6 +226,8 @@ namespace Ngol.Utilities.Reflection
         /// </exception>
         private static object InvokeMethod(object instance, Type type, string methodName, object[] arguments, BindingFlags bindingFlags)
         {
+            if(type == null)
+                throw new ArgumentNullException("type");
             if(bindingFlags == 0)
                 throw new ArgumentException("Cannot invoke a null method");
             MethodInfo methodInfo = type.GetMethod(methodName, bindingFlags);

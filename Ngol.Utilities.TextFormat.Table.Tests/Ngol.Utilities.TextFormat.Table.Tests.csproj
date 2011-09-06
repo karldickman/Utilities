@@ -45,4 +45,14 @@
     <Compile Include="TestTableFormatter.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <ProjectReference Include="..\Ngol.Utilities.TextFormat.Table\Ngol.Utilities.TextFormat.Table.csproj">
+      <Project>{977780FE-A189-4C4C-B1C6-CC6C38D81D81}</Project>
+      <Name>Ngol.Utilities.TextFormat.Table</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Ngol.Utilities.TextFormat\Ngol.Utilities.TextFormat.csproj">
+      <Project>{C596C8BD-7CA7-4E11-9969-D0CCB140A64B}</Project>
+      <Name>Ngol.Utilities.TextFormat</Name>
+    </ProjectReference>
+  </ItemGroup>
 </Project>

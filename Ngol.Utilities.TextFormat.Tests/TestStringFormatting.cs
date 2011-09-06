@@ -1,5 +1,6 @@
 using System;
-using Ngol.Utilities.Reflection;
+using Ngol.Utilities.Reflection.Extensions;
+using Ngol.Utilities.TextFormat;
 using NUnit.Framework;
 
 namespace Ngol.Utilities.TextFormat.Tests
@@ -60,7 +61,7 @@ namespace Ngol.Utilities.TextFormat.Tests
 
         protected static TOutput InvokeMethod<TClass, TOutput>(string methodName, params object[] arguments)
         {
-            return MethodUtilities.InvokeMethod<TClass, TOutput>(methodName, arguments);
+            return MethodExtensions.InvokeMethod<TClass, TOutput>(methodName, arguments);
         }
     }
 }
