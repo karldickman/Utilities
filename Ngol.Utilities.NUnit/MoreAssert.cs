@@ -12,7 +12,7 @@ namespace Ngol.Utilities.NUnit
     public static class MoreAssert
     {
         /// <summary>
-        /// Assert that two integers are equal.
+        /// Verify that two integers are equal.
         /// </summary>
         /// <param name="expected">
         /// One integer.
@@ -29,13 +29,13 @@ namespace Ngol.Utilities.NUnit
         }
 
         /// <summary>
-        /// Assert that two strings are equal.
+        /// Verify that two strings are equal.
         /// </summary>
         /// <param name="expected">
-        /// One string.
+        /// The expected string.
         /// </param>
         /// <param name="actual">
-        /// The other string.
+        /// The actual string.
         /// </param>
         /// <exception cref="AssertionException">
         /// Thrown if the assertion failed.
@@ -46,7 +46,26 @@ namespace Ngol.Utilities.NUnit
         }
 
         /// <summary>
-        /// Assert that a value appears in a collection.
+        /// Verify that two objects are equal. Two objects are considered equal
+        /// if they are both null, or if both have the same value. All non-numeric
+        /// types are compared using the <see cref="object.Equals(object)" /> method.
+        /// </summary>
+        /// <param name="expected">
+        /// The expected object.
+        /// </param>
+        /// <param name="actual">
+        /// The actual object.
+        /// </param>
+        /// <exception cref="AssertionException">
+        /// Thrown if the assertion failed.
+        /// </exception>
+        public static void AreEqual(object expected, object actual)
+        {
+            Assert.AreEqual(expected, actual);
+        }
+
+        /// <summary>
+        /// Verify that a value appears in a collection.
         /// </summary>
         /// <typeparam name="T">
         /// The type of the value and the collection.
@@ -67,7 +86,7 @@ namespace Ngol.Utilities.NUnit
         }
 
         /// <summary>
-        /// Assert that a value does not appear in a collection.
+        /// Verify that a value does not appear in a collection.
         /// </summary>
         /// <typeparam name="T">
         /// The type of the value and the collection.
@@ -113,7 +132,41 @@ namespace Ngol.Utilities.NUnit
         }
 
         /// <summary>
-        /// Assert that a collection is empty.
+        /// Verify that a collection has the specified number of values.
+        /// </summary>
+        /// <param name="expected">
+        /// The expected length of the collection.
+        /// </param>
+        /// <param name="collection">
+        /// The collection to test.
+        /// </param>
+        /// <exception cref="AssertionException">
+        /// Thrown if the assertion failed.
+        /// </exception>
+        public static void HasCount(int expected, IEnumerable collection)
+        {
+            Assert.AreEqual(expected, collection.Cast<object>().Count());
+        }
+
+        /// <summary>
+        /// Verify that a collection has the specified number of values.
+        /// </summary>
+        /// <param name="expected">
+        /// The expected length of the collection.
+        /// </param>
+        /// <param name="collection">
+        /// The collection to test.
+        /// </param>
+        /// <exception cref="AssertionException">
+        /// Thrown if the assertion failed.
+        /// </exception>
+        public static void HasCount<T>(int expected, IEnumerable<T> collection)
+        {
+            Assert.AreEqual(expected, collection.Count());
+        }
+
+        /// <summary>
+        /// Verify that a collection is empty.
         /// </summary>
         /// <param name="collection">
         /// The collection to test.
@@ -123,11 +176,11 @@ namespace Ngol.Utilities.NUnit
         /// </exception>
         public static void IsEmpty(IEnumerable collection)
         {
-            AreEqual(0, collection.Cast<object>().Count());
+            HasCount(0, collection);
         }
 
         /// <summary>
-        /// Assert that a collection is empty.
+        /// Verify that a collection is empty.
         /// </summary>
         /// <param name="collection">
         /// The collection to test.
@@ -137,7 +190,7 @@ namespace Ngol.Utilities.NUnit
         /// </exception>
         public static void IsEmpty<T>(IEnumerable<T> collection)
         {
-            AreEqual(0, collection.Count());
+            HasCount(0, collection);
         }
     }
 }
