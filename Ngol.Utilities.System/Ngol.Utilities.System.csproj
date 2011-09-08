@@ -44,6 +44,7 @@
     <Folder Include="Extensions\" />
     <Folder Include="Collections\" />
     <Folder Include="Collections\Extensions\" />
+    <Folder Include="Collections\Generic\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -52,6 +53,8 @@
     <Compile Include="Collections\Extensions\ICollectionExtensions.cs" />
     <Compile Include="Collections\Extensions\IEnumerableExtensions.cs" />
     <Compile Include="Collections\Extensions\NumberedEntry.cs" />
+    <Compile Include="Collections\Generic\IDictionary.cs" />
+    <Compile Include="Collections\Generic\Dictionary.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
