@@ -29,6 +29,26 @@ namespace Ngol.Utilities.NUnit
         }
 
         /// <summary>
+        /// Verify that two doubles are equal within a particular range.
+        /// </summary>
+        /// <param name="expected">
+        /// The expected value.
+        /// </param>
+        /// <param name="actual">
+        /// The actual value.
+        /// </param>
+        /// <param name="epsilon">
+        /// The tolerable range of error.
+        /// </param>
+        /// <exception cref="AssertionException">
+        /// Thrown if the assertion failed.
+        /// </exception>
+        public static void AreEqual(double expected, double actual, double epsilon)
+        {
+            Assert.AreEqual(expected, actual, epsilon);
+        }
+
+        /// <summary>
         /// Verify that two strings are equal.
         /// </summary>
         /// <param name="expected">
@@ -191,6 +211,20 @@ namespace Ngol.Utilities.NUnit
         public static void IsEmpty<T>(IEnumerable<T> collection)
         {
             HasCount(0, collection);
+        }
+
+        /// <summary>
+        /// Assert that a <see cref="Boolean" /> value is <see langword="true" />.
+        /// </summary>
+        /// <param name="value">
+        /// The <see cref="Boolean" /> value whose truth to check.
+        /// </param>
+        /// <exception cref="AssertionException">
+        /// Thrown if the assertion failed.
+        /// </exception>
+        public static void IsTrue(bool value)
+        {
+            Assert.IsTrue(value);
         }
     }
 }
