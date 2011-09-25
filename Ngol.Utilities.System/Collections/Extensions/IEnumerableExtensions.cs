@@ -85,7 +85,7 @@ namespace Ngol.Utilities.Collections.Extensions
                 throw new ArgumentException("Array index must be at least zero.");
             if(iterable.Count() + arrayIndex >= array.Length)
                 throw new ArgumentException("There is not enough space in the array to perform the copy operation.");
-            ForEach(iterable, arrayIndex, (value, index) =>
+            ForEachIndexed(iterable, arrayIndex, (value, index) =>
                 {
                     array[index] = value;
                 });
@@ -138,9 +138,9 @@ namespace Ngol.Utilities.Collections.Extensions
         /// Thrown if <paramref name="iterable"/> or <paramref name="action"/>
         /// are <see langword="null" />.
         /// </exception>
-        public static void ForEach<T>(this IEnumerable<T> iterable, Action<T, int> action)
+        public static void ForEachIndexed<T>(this IEnumerable<T> iterable, Action<T, int> action)
         {
-            ForEach(iterable, 0, action);
+            ForEachIndexed(iterable, 0, action);
         }
 
         /// <summary>
@@ -161,11 +161,71 @@ namespace Ngol.Utilities.Collections.Extensions
         /// Thrown if <paramref name="iterable"/> or <paramref name="action"/>
         /// are <see langword="null" />.
         /// </exception>
-        public static void ForEach<T>(this IEnumerable<T> iterable, int startIndex, Action<T, int> action)
+        public static void ForEachIndexed<T>(this IEnumerable<T> iterable, int startIndex, Action<T, int> action)
         {
             if(action == null)
                 throw new ArgumentNullException("action");
             Enumerate(iterable, startIndex).ForEach(entry => action(entry.Value, entry.Index));
+        }
+
+        /// <summary>
+        /// Apply an action to each element in an iterable.
+        /// </summary>
+        /// <param name="iterable">
+        /// The iterable to which to apply the actions.
+        /// </param>
+        /// <param name="action">
+        /// The action to apply.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="iterable"/> or <paramref name="action"/> is <see langword="null" />.
+        /// </exception>
+        public static void ForEach<TKey, TValue>(this IEnumerable<KeyValuePair<TKey, TValue>> iterable, Action<TKey, TValue> action)
+        {
+            if(action == null)
+                throw new ArgumentNullException("action");
+            Action<KeyValuePair<TKey, TValue>> actualAction = keyValuePair => action(keyValuePair.Key, keyValuePair.Value);
+            MoreEnumerable.ForEach(iterable, actualAction);
+        }
+
+        /// <summary>
+        /// Apply an action to each element in an iterable, keeping track of the index within the sequence.
+        /// </summary>
+        /// <param name="iterable">
+        /// The iterable to which to apply the actions.
+        /// </param>
+        /// <param name="action">
+        /// The action to apply.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="iterable"/> or <paramref name="action"/> is <see langword="null" />.
+        /// </exception>
+        public static void ForEachIndexed<TKey, TValue>(this IEnumerable<KeyValuePair<TKey, TValue>> iterable, Action<TKey, TValue, int> action)
+        {
+            ForEachIndexed(iterable, action);
+        }
+
+        /// <summary>
+        /// Apply an action to each element in an iterable, keeping track of the index within the sequence.
+        /// </summary>
+        /// <param name="iterable">
+        /// The iterable to which to apply the actions.
+        /// </param>
+        /// <param name="startIndex">
+        /// The value at which to start the indexed.
+        /// </param>
+        /// <param name="action">
+        /// The action to apply.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="iterable"/> or <paramref name="action"/> is <see langword="null" />.
+        /// </exception>
+        public static void ForEach<TKey, TValue>(this IEnumerable<KeyValuePair<TKey, TValue>> iterable, int startIndex, Action<TKey, TValue, int> action)
+        {
+            if(action == null)
+                throw new ArgumentNullException("action");
+            Action<KeyValuePair<TKey, TValue>, int> actualAction = (keyValuePair, index) => action(keyValuePair.Key, keyValuePair.Value, index);
+            ForEachIndexed(iterable, startIndex, actualAction);
         }
 
         /// <summary>
@@ -181,9 +241,9 @@ namespace Ngol.Utilities.Collections.Extensions
         /// Thrown if <paramref name="iterable"/> or <paramref name="action"/>
         /// is <see langword="null" />.
         /// </exception>
-        public static void ForEach<T>(this IEnumerable<T> iterable, Action<T, T> action)
+        public static void ForEachPair<T>(this IEnumerable<T> iterable, Action<T, T> action)
         {
-            ForEach(iterable, (a, b, i) => action(a, b));
+            ForEachIndexedPair(iterable, (a, b, i) => action(a, b));
         }
 
         /// <summary>
@@ -200,9 +260,9 @@ namespace Ngol.Utilities.Collections.Extensions
         /// Thrown if <paramref name="iterable"/> or <paramref name="action"/>
         /// is <see langword="null" />.
         /// </exception>
-        public static void ForEach<T>(this IEnumerable<T> iterable, Action<T, T, int> action)
+        public static void ForEachIndexedPair<T>(this IEnumerable<T> iterable, Action<T, T, int> action)
         {
-            ForEach(iterable, 0, action);
+            ForEachIndexedPair(iterable, 0, action);
         }
 
         /// <summary>
@@ -222,12 +282,12 @@ namespace Ngol.Utilities.Collections.Extensions
         /// Thrown if <paramref name="iterable"/> or <paramref name="action"/>
         /// is <see langword="null" />.
         /// </exception>
-        public static void ForEach<T>(this IEnumerable<T> iterable, int startIndex, Action<T, T, int> action)
+        public static void ForEachIndexedPair<T>(this IEnumerable<T> iterable, int startIndex, Action<T, T, int> action)
         {
             Func<T, T, Tuple<T, T>> selector = (a, b) => Tuple.Create(a, b);
             IEnumerable<Tuple<T, T>> pairs = Pairs(iterable, selector);
             Action<Tuple<T, T>, int> actualAction = (tuple, index) => action(tuple.Item1, tuple.Item2, index);
-            ForEach(pairs, startIndex, actualAction);
+            ForEachIndexed(pairs, startIndex, actualAction);
         }
 
         /// <summary>
