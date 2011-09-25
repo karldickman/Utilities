@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using MoreLinq;
 using Ngol.Utilities.System;
@@ -165,6 +166,68 @@ namespace Ngol.Utilities.Collections.Extensions
             if(action == null)
                 throw new ArgumentNullException("action");
             Enumerate(iterable, startIndex).ForEach(entry => action(entry.Value, entry.Index));
+        }
+
+        /// <summary>
+        /// Apply an action to every sequential pair of this iterable.
+        /// </summary>
+        /// <param name="iterable">
+        /// The iterable on which to apply the action.
+        /// </param>
+        /// <param name="action">
+        /// The action to apply.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="iterable"/> or <paramref name="action"/>
+        /// is <see langword="null" />.
+        /// </exception>
+        public static void ForEach<T>(this IEnumerable<T> iterable, Action<T, T> action)
+        {
+            ForEach(iterable, (a, b, i) => action(a, b));
+        }
+
+        /// <summary>
+        /// Apply an action to every sequential pair of this iterable, with an index to keep
+        /// track of where the pair is in the sequence.
+        /// </summary>
+        /// <param name="iterable">
+        /// The iterable on which to apply the action.
+        /// </param>
+        /// <param name="action">
+        /// The action to apply.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="iterable"/> or <paramref name="action"/>
+        /// is <see langword="null" />.
+        /// </exception>
+        public static void ForEach<T>(this IEnumerable<T> iterable, Action<T, T, int> action)
+        {
+            ForEach(iterable, 0, action);
+        }
+
+        /// <summary>
+        /// Apply an action to every sequential pair of this iterable, with an index to keep
+        /// track of where the pair is in the sequence.
+        /// </summary>
+        /// <param name="iterable">
+        /// The iterable on which to apply the action.
+        /// </param>
+        /// <param name="startIndex">
+        /// The value to which to initialize the index.
+        /// </param>
+        /// <param name="action">
+        /// The action to apply.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="iterable"/> or <paramref name="action"/>
+        /// is <see langword="null" />.
+        /// </exception>
+        public static void ForEach<T>(this IEnumerable<T> iterable, int startIndex, Action<T, T, int> action)
+        {
+            Func<T, T, Tuple<T, T>> selector = (a, b) => Tuple.Create(a, b);
+            IEnumerable<Tuple<T, T>> pairs = Pairs(iterable, selector);
+            Action<Tuple<T, T>, int> actualAction = (tuple, index) => action(tuple.Item1, tuple.Item2, index);
+            ForEach(pairs, startIndex, actualAction);
         }
 
         /// <summary>
@@ -394,6 +457,104 @@ namespace Ngol.Utilities.Collections.Extensions
         public static bool None<TSource>(this IEnumerable<TSource> iterable, Predicate<TSource> predicate)
         {
             return !Enumerable.Any(iterable, new Func<TSource, bool>(predicate));
+        }
+
+        /// <summary>
+        /// Returns the elements of the <paramref name="iterable"/> sorted using the default comparer.
+        /// </summary>
+        /// <param name="iterable">
+        /// The iterable to sort.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="iterable"/> is <see langword="null" />.
+        /// </exception>
+        public static IEnumerable<T> Sorted<T>(this IEnumerable<T> iterable) where T : IComparable<T>
+        {
+            List<T> list = new List<T>(iterable);
+            list.Sort();
+            return list;
+        }
+
+        /// <summary>
+        /// Returns the elements of the <paramref name="iterable"/> sorted using the specified comparison.
+        /// </summary>
+        /// <param name="iterable">
+        /// The iterable to sort.
+        /// </param>
+        /// <param name="comparison">
+        /// The comparison to use when comparing elements.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="iterable"/> or <paramref name="comparison"/> is <see langword="null" />.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown if the <paramref name="comparison"/> caused an error during the sort.  For
+        /// example, <paramref name="comparison"/> might not return 0 when comparing an item
+        /// with itself.
+        /// </exception>
+        public static IEnumerable<T> Sorted<T>(this IEnumerable<T> iterable, Comparison<T> comparison)
+        {
+            List<T> list = new List<T>(iterable);
+            list.Sort(comparison);
+            return list;
+        }
+
+        /// <summary>
+        /// Returns the elements of the <paramref name="iterable"/> sorted using the default comparer.
+        /// </summary>
+        /// <param name="iterable">
+        /// The iterable to sort.
+        /// </param>
+        /// <param name="comparer">
+        /// The IComparer&gt;T&lt; to use.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if
+        /// <list type="bullet">
+        /// <item><paramref name="iterable"/> is <see langword="null" />.</item>
+        /// <item><paramref name="comparer"/> is <see langword="null" />
+        /// and the default comparer cannot find an implementation of the IComparable&gt;T&lt;
+        /// generic interface or the <see cref="IComparable" /> interface for type
+        /// <typeparamref name="T" />.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown if the <paramref name="comparer"/> caused an error during the sort.  For
+        /// example, <paramref name="comparer"/> might not return 0 when comparing an item
+        /// with itself.
+        /// </exception>
+        public static IEnumerable<T> Sorted<T>(this IEnumerable<T> iterable, IComparer<T> comparer)
+        {
+            List<T> list = new List<T>(iterable);
+            list.Sort(comparer);
+            return list;
+        }
+
+        /// <summary>
+        /// Take every consecutive pair of values in a sequence
+        /// and apply a selector function to them, generating a new sequence.
+        /// </summary>
+        /// <example>
+        /// <code>
+        /// IEnumerable&gt;int&lt; numbers = new List&gt;int&lt; { -1, 0, 1, 1, 2, 3, 5, 8, 13, };
+        /// Console.WriteLine(string.Join(", ", numbers.PairWise((a, b) =&lt; a + b)));
+        /// </code>
+        /// This will result in the following output: 0, 1, 1, 2, 3, 5, 8, 13, 21, 34.
+        /// </example>
+        /// <param name="iterable">
+        /// The iterable to which to apply pairwise operations.
+        /// </param>
+        /// <param name="selector">
+        /// The selector function used to convert the pairs into output values.
+        /// </param>
+        /// <returns>
+        /// An empty iterable if there are less than two items in the <paramref name="iterable"/>.
+        /// </returns>
+        public static IEnumerable<TOut> Pairs<TIn, TOut>(this IEnumerable<TIn> iterable, Func<TIn, TIn, TOut> selector)
+        {
+            if(iterable == null)
+                throw new ArgumentNullException("iterable");
+            return MoreEnumerable.Zip(iterable, iterable.Skip(1), selector);
         }
 
         /// <summary>

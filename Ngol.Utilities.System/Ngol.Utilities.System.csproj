@@ -55,6 +55,7 @@
     <Compile Include="Collections\Extensions\NumberedEntry.cs" />
     <Compile Include="Collections\Generic\IDictionary.cs" />
     <Compile Include="Collections\Generic\Dictionary.cs" />
+    <Compile Include="Extensions\IDisposableExtensions.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
