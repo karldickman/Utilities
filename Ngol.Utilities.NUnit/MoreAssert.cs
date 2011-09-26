@@ -214,17 +214,31 @@ namespace Ngol.Utilities.NUnit
         }
 
         /// <summary>
-        /// Assert that a <see cref="Boolean" /> value is <see langword="true" />.
+        /// Assert that a <see cref="Boolean" /> value is <see langword="false" />.
         /// </summary>
-        /// <param name="value">
+        /// <param name="condition">
         /// The <see cref="Boolean" /> value whose truth to check.
         /// </param>
         /// <exception cref="AssertionException">
         /// Thrown if the assertion failed.
         /// </exception>
-        public static void IsTrue(bool value)
+        public static void IsFalse(bool condition)
         {
-            Assert.IsTrue(value);
+            Assert.IsFalse(condition);
+        }
+
+        /// <summary>
+        /// Assert that a <see cref="Boolean" /> value is <see langword="true" />.
+        /// </summary>
+        /// <param name="condition">
+        /// The <see cref="Boolean" /> value whose truth to check.
+        /// </param>
+        /// <exception cref="AssertionException">
+        /// Thrown if the assertion failed.
+        /// </exception>
+        public static void That(bool condition)
+        {
+            Assert.IsTrue(condition);
         }
     }
 }
