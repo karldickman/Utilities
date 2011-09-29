@@ -1,7 +1,9 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using Ngol.Utilities.System;
 
-namespace Ngol.Utilities.System.Collections.Generic
+namespace Ngol.Utilities.Collections.Generic
 {
     /// <summary>
     /// Represents a generic collection of key/value pairs, where each key consists of two heterogeneous
