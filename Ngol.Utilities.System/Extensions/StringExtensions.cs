@@ -16,13 +16,13 @@ namespace Ngol.Utilities.System.Extensions
         /// <exception cref="ArgumentNullException">
         /// Thrown if any argument is <see langword="null" />.
         /// </exception>
-        public static string Join(this string joinWith, IEnumerable<string> sequence)
+        public static string Join<T>(this string joinWith, IEnumerable<T> sequence)
         {
             if(joinWith == null)
                 throw new ArgumentNullException("joinWith");
             if(sequence == null)
                 throw new ArgumentNullException("sequence");
-            return string.Join(joinWith, sequence.ToArray());
+            return string.Join(joinWith, sequence.Select(item => item.ToString()).ToArray());
         }
     }
 }
