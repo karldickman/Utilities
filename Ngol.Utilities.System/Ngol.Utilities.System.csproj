@@ -45,6 +45,8 @@
     <Folder Include="Collections\" />
     <Folder Include="Collections\Extensions\" />
     <Folder Include="Collections\Generic\" />
+    <Folder Include="Collections\ObjectModel\" />
+    <Folder Include="Collections\Specialized\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -56,6 +58,12 @@
     <Compile Include="Collections\Generic\IDictionary.cs" />
     <Compile Include="Collections\Generic\Dictionary.cs" />
     <Compile Include="Extensions\IDisposableExtensions.cs" />
+    <Compile Include="Collections\ObjectModel\ObservableCollection.cs" />
+    <Compile Include="Collections\Specialized\INotifyCollectionChanged.cs" />
+    <Compile Include="Collections\Specialized\NotifyCollectionChangedEventHandler.cs" />
+    <Compile Include="Collections\Specialized\NotifyCollectionChangedEventArgs.cs" />
+    <Compile Include="Collections\Specialized\NotifyCollectionChangedAction.cs" />
+    <Compile Include="Extensions\StringExtensions.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
