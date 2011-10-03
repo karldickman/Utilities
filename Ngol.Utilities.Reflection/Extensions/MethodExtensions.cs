@@ -14,38 +14,7 @@ namespace Ngol.Utilities.Reflection.Extensions
         /// </summary>
         /// <param name="instance">
         /// The instance on which to invoke the method.
-        /// </param>
-        /// <param name="methodName">
-        /// The name of the method to invoke.
-        /// </param>
-        /// <param name="arguments">
-        /// The arguments to pass to the method.
-        /// </param>
-        /// <typeparam name="TInstance">
-        /// The type of the <paramref name="instance"/>.
-        /// </typeparam>
-        /// <typeparam name="TOutput">
-        /// The value expected to be returned from the function.
-        /// </typeparam>
-        /// <returns>
-        /// The value returned by the method.
-        /// </returns>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown if <paramref name="instance"/> is <see langword="null" />.
-        /// </exception>
-        public static TOutput InvokeMethod<TInstance, TOutput>(this TInstance instance, string methodName, params object[] arguments)
-        {
-            if(instance == null)
-                throw new ArgumentNullException("instance");
-            return (TOutput)instance.InvokeMethod(typeof(TInstance), methodName, arguments);
-        }
-
-        /// <summary>
-        /// Invoke a method on an instance.
-        /// </summary>
-        /// <param name="instance">
-        /// The instance on which to invoke the method.
-        /// </param>
+        /// </param>>
         /// <param name="methodName">
         /// The name of the method to invoke.
         /// </param>
@@ -62,81 +31,7 @@ namespace Ngol.Utilities.Reflection.Extensions
         {
             if(instance == null)
                 throw new ArgumentNullException("instance");
-            return instance.InvokeMethod(instance.GetType(), methodName, arguments);
-        }
-
-        /// <summary>
-        /// Invoke a method on an instance.
-        /// </summary>
-        /// <param name="instance">
-        /// The instance on which to invoke the method.
-        /// </param>
-        /// <param name="type">
-        /// The of the <paramref name="instance"/>.
-        /// </param>
-        /// <param name="methodName">
-        /// The name of the method to invoke.
-        /// </param>
-        /// <param name="arguments">
-        /// The arguments to pass to the method.
-        /// </param>
-        /// <returns>
-        /// The value returned by the method.
-        /// </returns>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown if <paramref name="instance"/> is <see langword="null" />.
-        /// </exception>
-        public static object InvokeMethod(this object instance, Type type, string methodName, params object[] arguments)
-        {
-            if(instance == null)
-                throw new ArgumentNullException("instance");
-            return InvokeMethod(instance, type, methodName, arguments, CommonBindingFlags.InstanceFlags);
-        }
-
-        /// <summary>
-        /// Invoke a method on a class.
-        /// </summary>
-        /// <typeparam name="TClass">
-        /// The class on which to invoke the method.
-        /// </typeparam>
-        /// <param name="methodName">
-        /// The name of the method to invoke.
-        /// </param>
-        /// <param name="arguments">
-        /// The arguments to pass to the method.
-        /// </param>
-        /// <typeparam name="TOutput">
-        /// The expected return type of the method.
-        /// </typeparam>
-        /// <returns>
-        /// The value returned by the method.
-        /// </returns>
-        public static TOutput InvokeMethod<TClass, TOutput>(string methodName, params object[] arguments)
-        {
-            return InvokeMethod<TOutput>(typeof(TClass), methodName, arguments);
-        }
-
-        /// <summary>
-        /// Invoke a method on a class.
-        /// </summary>
-        /// <param name="type">
-        /// The class on which to invoke the method.
-        /// </param>
-        /// <param name="methodName">
-        /// The name of the method to invoke.
-        /// </param>
-        /// <param name="arguments">
-        /// The arguments to pass to the method.
-        /// </param>
-        /// <typeparam name="TOutput">
-        /// The expected return type of the method.
-        /// </typeparam>
-        /// <returns>
-        /// The value returned by the method.
-        /// </returns>
-        public static TOutput InvokeMethod<TOutput>(this Type type, string methodName, params object[] arguments)
-        {
-            return (TOutput)InvokeMethod(type, methodName, arguments);
+            return InvokeMethod(instance, instance.GetType(), methodName, arguments, CommonBindingFlags.InstanceFlags);
         }
 
         /// <summary>
@@ -232,9 +127,7 @@ namespace Ngol.Utilities.Reflection.Extensions
                 throw new ArgumentException("Cannot invoke a null method");
             MethodInfo methodInfo = type.GetMethod(methodName, bindingFlags);
             if(methodInfo == null)
-            {
                 throw new ArgumentException(string.Format("There is no method {0}() on {1}", methodName, type.Name));
-            }
             return methodInfo.Invoke(instance, arguments);
         }
     }
