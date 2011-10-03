@@ -37,7 +37,7 @@ namespace Ngol.Utilities.Collections.Extensions
         /// <see langword="true" /> if any values were <see langword="true" />;
         /// <see langword="false" /> if every single value was false.
         /// </returns>
-        public static bool AnyAreTrue(this IEnumerable<bool> booleans)
+        public static bool Any(this IEnumerable<bool> booleans)
         {
             return Enumerable.Any(booleans, boolean => boolean);
         }
@@ -347,6 +347,78 @@ namespace Ngol.Utilities.Collections.Extensions
         /// Loop over two sequences at once and apply an action to each corresponding entry in the sequence.
         /// </summary>
         /// <remarks>
+        /// If the input sequences are of different lengths, then <see cref="InvalidOperationException" />
+        /// is thrown if they do not terminate at the same time.  This operator uses deferred execution
+        /// and streams its results.
+        /// </remarks>
+        /// <param name="first">
+        /// The first sequence.
+        /// </param>
+        /// <param name="second">
+        /// The second sequence.
+        /// </param>
+        /// <param name="action">
+        /// The action to apply to each element in the sequence.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if any argument is <see langword="null" />.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown if the end of one sequence is encountered before the end of the others.
+        /// </exception>
+        public static void ForEachEqualIndexed<T1, T2>(this IEnumerable<T1> first, IEnumerable<T2> second, Action<T1, T2, int> action)
+        {
+            if(first == null)
+                throw new ArgumentNullException("first");
+            if(second == null)
+                throw new ArgumentNullException("second");
+            if(action == null)
+                throw new ArgumentNullException("action");
+            first.ForEachEqualIndexed(second, 0, action);
+        }
+
+        /// <summary>
+        /// Loop over two sequences at once and apply an action to each corresponding entry in the sequence.
+        /// </summary>
+        /// <remarks>
+        /// If the input sequences are of different lengths, then <see cref="InvalidOperationException" />
+        /// is thrown if they do not terminate at the same time.  This operator uses deferred execution
+        /// and streams its results.
+        /// </remarks>
+        /// <param name="first">
+        /// The first sequence.
+        /// </param>
+        /// <param name="second">
+        /// The second sequence.
+        /// </param>
+        /// <param name="startIndex">
+        /// The value at which to start the indexes provided to the action.
+        /// </param>
+        /// <param name="action">
+        /// The action to apply to each element in the sequence.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if any argument is <see langword="null" />.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown if the end of one sequence is encountered before the end of the others.
+        /// </exception>
+        public static void ForEachEqualIndexed<T1, T2>(this IEnumerable<T1> first, IEnumerable<T2> second, int startIndex, Action<T1, T2, int> action)
+        {
+            if(first == null)
+                throw new ArgumentNullException("first");
+            if(second == null)
+                throw new ArgumentNullException("second");
+            if(action == null)
+                throw new ArgumentNullException("action");
+            first.EquiZip<T1, T2, Tuple<T1, T2>>(second, Tuple.Create<T1, T2>)
+                 .ForEachIndexed(startIndex, (entry, index) => action(entry.Item1, entry.Item2, index));
+        }
+
+        /// <summary>
+        /// Loop over two sequences at once and apply an action to each corresponding entry in the sequence.
+        /// </summary>
+        /// <remarks>
         /// If the input sequences are of different lengths, the result sequence will always be as long as the longest
         /// input sequence.  The default value of the shorter sequence value type is used to
         /// pad the other sequences.  This operator uses deferred execution and streams its results.
@@ -520,6 +592,120 @@ namespace Ngol.Utilities.Collections.Extensions
         }
 
         /// <summary>
+        /// Projects each element of a seqquence into a new form by incorporating the element's index
+        /// within the sequence.
+        /// </summary>
+        /// <param name="source">
+        /// A sequence of values on which to invoke a transform function.
+        /// </param>
+        /// <param name="selector">
+        /// A transform function to apply to each source element; the second parameter of the function represents the index
+        /// of the source element.
+        /// </param>
+        /// <returns>
+        /// An IEnumerable&lt;<typeparamref name="TResult" /> whose elements are the result of invoking the transform function
+        /// on each element of <paramref name="source"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="source"/> or <paramref name="selector"/> is <see langword="null" />.
+        /// </exception>
+        public static IEnumerable<TResult> Select<TSource, TResult>(this IEnumerable<TSource> source, Func<TSource, int, TResult> selector)
+        {
+            if(source == null)
+                throw new ArgumentNullException("iterable");
+            if(selector == null)
+                throw new ArgumentNullException("selector");
+            return source.Select(0, selector);
+        }
+
+        /// <summary>
+        /// Projects each element of a seqquence into a new form by incorporating the element's index
+        /// within the sequence.
+        /// </summary>
+        /// <param name="source">
+        /// A sequence of values on which to invoke a transform function.
+        /// </param>
+        /// <param name="selector">
+        /// A transform function to apply to each source element; the second parameter of the function represents the index
+        /// of the source element.
+        /// </param>
+        /// <param name="startIndex">
+        /// The value at which to initialize the indexes that are passed to the <paramref name="selector"/>.
+        /// </param>
+        /// <returns>
+        /// An IEnumerable&lt;<typeparamref name="TResult" /> whose elements are the result of invoking the transform function
+        /// on each element of <paramref name="source"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="source"/> or <paramref name="selector"/> is <see langword="null" />.
+        /// </exception>
+        public static IEnumerable<TResult> Select<TSource, TResult>(this IEnumerable<TSource> source, int startIndex, Func<TSource, int, TResult> selector)
+        {
+            if(source == null)
+                throw new ArgumentNullException("iterable");
+            if(selector == null)
+                throw new ArgumentNullException("selector");
+            return source.Enumerate(startIndex).Select(entry => selector(entry.Value, entry.Index));
+        }
+
+        /// <summary>
+        /// Projects each elment of a sequence to an IEnumerable&gt;T&lt;, and
+        /// flattens the resulting sequences into one sequence.
+        /// The index of each source element is used in the projected form of that element.
+        /// </summary>
+        /// <param name="source">
+        /// A sequence of values to project.
+        /// </param>
+        /// <param name="selector">
+        /// A transform function to apply to each source elment; the second parameter of the function represents
+        /// the index of the source element.
+        /// </param>
+        /// <returns>
+        /// An IEnumerable&gt;T&lt; whose elements are the result of invoking the one-to-many transform function on each element of an input sequence.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="source"/> or <paramref name="selector"/> is <see langword="null" />.
+        /// </exception>
+        public static IEnumerable<TResult> SelectMany<TSource, TResult>(this IEnumerable<TSource> source, Func<TSource, int, IEnumerable<TResult>> selector)
+        {
+            if(source == null)
+                throw new ArgumentNullException("iterable");
+            if(selector == null)
+                throw new ArgumentNullException("selector");
+            return source.SelectMany(0, selector);
+        }
+
+        /// <summary>
+        /// Projects each elment of a sequence to an IEnumerable&gt;T&lt;, and
+        /// flattens the resulting sequences into one sequence.
+        /// The index of each source element is used in the projected form of that element.
+        /// </summary>
+        /// <param name="source">
+        /// A sequence of values to project.
+        /// </param>
+        /// <param name="startIndex">
+        /// The value at which to initialize the indexes of the source elements.
+        /// </param>
+        /// <param name="selector">
+        /// A transform function to apply to each source elment; the second parameter of the function represents
+        /// the index of the source element.
+        /// </param>
+        /// <returns>
+        /// An IEnumerable&gt;T&lt; whose elements are the result of invoking the one-to-many transform function on each element of an input sequence.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="source"/> or <paramref name="selector"/> is <see langword="null" />.
+        /// </exception>
+        public static IEnumerable<TResult> SelectMany<TSource, TResult>(this IEnumerable<TSource> source, int startIndex, Func<TSource, int, IEnumerable<TResult>> selector)
+        {
+            if(source == null)
+                throw new ArgumentNullException("iterable");
+            if(selector == null)
+                throw new ArgumentNullException("selector");
+            return source.Enumerate(startIndex).SelectMany(entry => selector(entry.Value, entry.Index));
+        }
+
+        /// <summary>
         /// Returns the elements of the <paramref name="iterable"/> sorted using the default comparer.
         /// </summary>
         /// <param name="iterable">
@@ -528,35 +714,11 @@ namespace Ngol.Utilities.Collections.Extensions
         /// <exception cref="ArgumentNullException">
         /// Thrown if <paramref name="iterable"/> is <see langword="null" />.
         /// </exception>
-        public static IEnumerable<T> Sorted<T>(this IEnumerable<T> iterable) where T : IComparable<T>
+        public static IOrderedEnumerable<T> Sorted<T>(this IEnumerable<T> iterable) where T : IComparable<T>
         {
-            List<T> list = new List<T>(iterable);
-            list.Sort();
-            return list;
-        }
-
-        /// <summary>
-        /// Returns the elements of the <paramref name="iterable"/> sorted using the specified comparison.
-        /// </summary>
-        /// <param name="iterable">
-        /// The iterable to sort.
-        /// </param>
-        /// <param name="comparison">
-        /// The comparison to use when comparing elements.
-        /// </param>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown if <paramref name="iterable"/> or <paramref name="comparison"/> is <see langword="null" />.
-        /// </exception>
-        /// <exception cref="ArgumentException">
-        /// Thrown if the <paramref name="comparison"/> caused an error during the sort.  For
-        /// example, <paramref name="comparison"/> might not return 0 when comparing an item
-        /// with itself.
-        /// </exception>
-        public static IEnumerable<T> Sorted<T>(this IEnumerable<T> iterable, Comparison<T> comparison)
-        {
-            List<T> list = new List<T>(iterable);
-            list.Sort(comparison);
-            return list;
+            if(iterable == null)
+                throw new ArgumentNullException("iterable");
+            return iterable.OrderBy<T, T>(item => item);
         }
 
         /// <summary>
@@ -583,11 +745,11 @@ namespace Ngol.Utilities.Collections.Extensions
         /// example, <paramref name="comparer"/> might not return 0 when comparing an item
         /// with itself.
         /// </exception>
-        public static IEnumerable<T> Sorted<T>(this IEnumerable<T> iterable, IComparer<T> comparer)
+        public static IOrderedEnumerable<T> Sorted<T>(this IEnumerable<T> iterable, IComparer<T> comparer)
         {
-            List<T> list = new List<T>(iterable);
-            list.Sort(comparer);
-            return list;
+            if(iterable == null)
+                throw new ArgumentNullException("iterable");
+            return iterable.OrderBy<T, T>(item => item, comparer);
         }
 
         /// <summary>
