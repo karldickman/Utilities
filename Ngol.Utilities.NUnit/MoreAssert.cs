@@ -12,79 +12,6 @@ namespace Ngol.Utilities.NUnit
     public static class MoreAssert
     {
         /// <summary>
-        /// Verify that two integers are equal.
-        /// </summary>
-        /// <param name="expected">
-        /// One integer.
-        /// </param>
-        /// <param name="actual">
-        /// The other integer.
-        /// </param>
-        /// <exception cref="AssertionException">
-        /// Thrown if the assertion failed.
-        /// </exception>
-        public static void AreEqual(int expected, int actual)
-        {
-            Assert.AreEqual(expected, actual);
-        }
-
-        /// <summary>
-        /// Verify that two doubles are equal within a particular range.
-        /// </summary>
-        /// <param name="expected">
-        /// The expected value.
-        /// </param>
-        /// <param name="actual">
-        /// The actual value.
-        /// </param>
-        /// <param name="epsilon">
-        /// The tolerable range of error.
-        /// </param>
-        /// <exception cref="AssertionException">
-        /// Thrown if the assertion failed.
-        /// </exception>
-        public static void AreEqual(double expected, double actual, double epsilon)
-        {
-            Assert.AreEqual(expected, actual, epsilon);
-        }
-
-        /// <summary>
-        /// Verify that two strings are equal.
-        /// </summary>
-        /// <param name="expected">
-        /// The expected string.
-        /// </param>
-        /// <param name="actual">
-        /// The actual string.
-        /// </param>
-        /// <exception cref="AssertionException">
-        /// Thrown if the assertion failed.
-        /// </exception>
-        public static void AreEqual(string expected, string actual)
-        {
-            Assert.AreEqual(expected, actual);
-        }
-
-        /// <summary>
-        /// Verify that two objects are equal. Two objects are considered equal
-        /// if they are both null, or if both have the same value. All non-numeric
-        /// types are compared using the <see cref="object.Equals(object)" /> method.
-        /// </summary>
-        /// <param name="expected">
-        /// The expected object.
-        /// </param>
-        /// <param name="actual">
-        /// The actual object.
-        /// </param>
-        /// <exception cref="AssertionException">
-        /// Thrown if the assertion failed.
-        /// </exception>
-        public static void AreEqual(object expected, object actual)
-        {
-            Assert.AreEqual(expected, actual);
-        }
-
-        /// <summary>
         /// Verify that a value appears in a collection.
         /// </summary>
         /// <typeparam name="T">
@@ -135,20 +62,6 @@ namespace Ngol.Utilities.NUnit
         public static void Fail()
         {
             Assert.Fail();
-        }
-
-        /// <summary>
-        /// Throw an <see cref="AssertionException" />.
-        /// </summary>
-        /// <param name="message">
-        /// The message to provide in the exception.
-        /// </param>
-        /// <exception cref="AssertionException">
-        /// Thrown if the assertion failed.
-        /// </exception>
-        public static void Fail(string message)
-        {
-            Assert.Fail(message);
         }
 
         /// <summary>
@@ -214,31 +127,31 @@ namespace Ngol.Utilities.NUnit
         }
 
         /// <summary>
-        /// Assert that a <see cref="Boolean" /> value is <see langword="false" />.
+        /// Verify that a collection is not empty.
         /// </summary>
-        /// <param name="condition">
-        /// The <see cref="Boolean" /> value whose truth to check.
+        /// <param name="collection">
+        /// The collection to test.
         /// </param>
         /// <exception cref="AssertionException">
         /// Thrown if the assertion failed.
         /// </exception>
-        public static void IsFalse(bool condition)
+        public static void IsNotEmpty(IEnumerable collection)
         {
-            Assert.IsFalse(condition);
+            Assert.AreNotEqual(0, collection.Cast<object>().Count());
         }
 
         /// <summary>
-        /// Assert that a <see cref="Boolean" /> value is <see langword="true" />.
+        /// Verify that a collection is not empty.
         /// </summary>
-        /// <param name="condition">
-        /// The <see cref="Boolean" /> value whose truth to check.
+        /// <param name="collection">
+        /// The collection to test.
         /// </param>
         /// <exception cref="AssertionException">
         /// Thrown if the assertion failed.
         /// </exception>
-        public static void That(bool condition)
+        public static void IsNotEmpty<T>(IEnumerable<T> collection)
         {
-            Assert.IsTrue(condition);
+            Assert.AreNotEqual(0, collection.Count());
         }
     }
 }
