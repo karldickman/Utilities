@@ -52,16 +52,11 @@ namespace Ngol.Utilities.TextFormat.Tests
         [Test]
         public void TestSpacesBefore()
         {
-            Assert.AreEqual(0, InvokeMethod<StringFormatting, int>("SpacesBefore", 4, 4));
-            Assert.AreEqual(1, InvokeMethod<StringFormatting, int>("SpacesBefore", 4, 6));
-            Assert.AreEqual(2, InvokeMethod<StringFormatting, int>("SpacesBefore", 4, 8));
-            Assert.AreEqual(3, InvokeMethod<StringFormatting, int>("SpacesBefore", 4, 10));
-            Assert.AreEqual(4, InvokeMethod<StringFormatting, int>("SpacesBefore", 4, 12));
-        }
-
-        protected static TOutput InvokeMethod<TClass, TOutput>(string methodName, params object[] arguments)
-        {
-            return MethodExtensions.InvokeMethod<TClass, TOutput>(methodName, arguments);
+            Assert.AreEqual(0, typeof(StringFormatting).InvokeMethod("SpacesBefore", 4, 4));
+            Assert.AreEqual(1, typeof(StringFormatting).InvokeMethod("SpacesBefore", 4, 6));
+            Assert.AreEqual(2, typeof(StringFormatting).InvokeMethod("SpacesBefore", 4, 8));
+            Assert.AreEqual(3, typeof(StringFormatting).InvokeMethod("SpacesBefore", 4, 10));
+            Assert.AreEqual(4, typeof(StringFormatting).InvokeMethod("SpacesBefore", 4, 12));
         }
     }
 }

@@ -33,6 +33,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="MoreLinq, Version=1.0.11522.0, Culture=neutral, PublicKeyToken=null">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\MoreLinq.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
@@ -54,6 +59,10 @@
     <ProjectReference Include="..\Ngol.Utilities.TextFormat\Ngol.Utilities.TextFormat.csproj">
       <Project>{C596C8BD-7CA7-4E11-9969-D0CCB140A64B}</Project>
       <Name>Ngol.Utilities.TextFormat</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Ngol.Utilities.System\Ngol.Utilities.System.csproj">
+      <Project>{B53B9249-70AC-4414-95A8-0E7838885C2B}</Project>
+      <Name>Ngol.Utilities.System</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

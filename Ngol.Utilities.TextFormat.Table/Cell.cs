@@ -51,8 +51,7 @@ namespace Ngol.Utilities.TextFormat.Table
         /// <param name="value">
         /// The value to use for the cell.
         /// </param>
-        public Cell(object value)
-            : this(value, DefaultAlignment)
+        public Cell(object value) : this(value, DefaultAlignment)
         {
         }
 
@@ -72,7 +71,7 @@ namespace Ngol.Utilities.TextFormat.Table
                 align = DefaultAlignment;
             }
             Value = value;
-            this.Align = align;
+            Align = align;
         }
 
         #endregion
@@ -104,7 +103,7 @@ namespace Ngol.Utilities.TextFormat.Table
         {
             return Text;
         }
-
+        
         #endregion
     }
 }

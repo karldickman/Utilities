@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Ngol.Utilities.TextFormat.Table
 {
@@ -55,8 +56,7 @@ namespace Ngol.Utilities.TextFormat.Table
         /// <summary>
         /// Create a formatter that produces completely undecorated tables.
         /// </summary>
-        public TableFormatter()
-            : this(' ')
+        public TableFormatter() : this(' ')
         {
         }
 
@@ -67,8 +67,7 @@ namespace Ngol.Utilities.TextFormat.Table
         /// <param name="columnSeparator">
         /// The <see cref="System.Char"/> used to separate the columns.
         /// </param>
-        public TableFormatter(char columnSeparator)
-            : this('\0', columnSeparator, '\0', '\0', '\0', '\0')
+        public TableFormatter(char columnSeparator) : this('\0', columnSeparator, '\0', '\0', '\0', '\0')
         {
         }
 
@@ -82,8 +81,7 @@ namespace Ngol.Utilities.TextFormat.Table
         /// <param name="columnSeparator">
         /// The <see cref="System.Char"/> used to separate the columns.
         /// </param>
-        public TableFormatter(char verticalBorder, char columnSeparator)
-            : this(verticalBorder, columnSeparator, verticalBorder, '\0', '\0', '\0')
+        public TableFormatter(char verticalBorder, char columnSeparator) : this(verticalBorder, columnSeparator, verticalBorder, '\0', '\0', '\0')
         {
         }
 
@@ -100,8 +98,7 @@ namespace Ngol.Utilities.TextFormat.Table
         /// <param name="rightBorder">
         /// The <see cref="System.Char"/> used for the table's right border.
         /// </param>
-        public TableFormatter(char leftBorder, char columnSeparator, char rightBorder)
-            : this(leftBorder, columnSeparator, rightBorder, '\0', '\0', '\0')
+        public TableFormatter(char leftBorder, char columnSeparator, char rightBorder) : this(leftBorder, columnSeparator, rightBorder, '\0', '\0', '\0')
         {
         }
 
@@ -122,8 +119,7 @@ namespace Ngol.Utilities.TextFormat.Table
         /// The <see cref="System.Char"/> used for the tables' horizontal
         /// borders.
         /// </param>
-        public TableFormatter(char leftBorder, char columnSeparator, char rightBorder, char horizontalBorder)
-            : this(leftBorder, columnSeparator, rightBorder, horizontalBorder, horizontalBorder, horizontalBorder)
+        public TableFormatter(char leftBorder, char columnSeparator, char rightBorder, char horizontalBorder) : this(leftBorder, columnSeparator, rightBorder, horizontalBorder, horizontalBorder, horizontalBorder)
         {
         }
 
@@ -183,8 +179,13 @@ namespace Ngol.Utilities.TextFormat.Table
         /// <param name="values">
         /// A sequence of values to be formatted into a table.
         /// </param>
-        public IList<string> Format(IList<IList> values)
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="values"/> is <see langword="null" />.
+        /// </exception>
+        public Table Format(IEnumerable<IEnumerable<object>> values)
         {
+            if(values == null)
+                throw new ArgumentNullException("values");
             return Format(values, null);
         }
 
@@ -198,28 +199,21 @@ namespace Ngol.Utilities.TextFormat.Table
         /// <param name="alignments">
         /// The alignments for each column.
         /// </param>
-        public IList<string> Format(IList<IList> values, IList<Alignment> alignments)
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="values"/> is <see langword="null" />.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown if the number
+        /// of columns does not match the number of <paramref name="alignments"/>.
+        /// </exception>
+        public Table Format(IEnumerable<IEnumerable<object>> values, IEnumerable<Alignment> alignments)
         {
-            IList<Row> rows = FormatRows(values, alignments);
-            if(rows.Count == 0)
-            {
-                return new List<string>();
-            }
-            return new Table(rows, GetDefaultMaxWidths(rows[0].ColumnCount)).Lines();
-        }
-
-        /// <summary>
-        /// The default maximum width must be as large as possible so that
-        /// normal values are less than the default.
-        /// </summary>
-        protected static IList<int> GetDefaultMaxWidths(int size)
-        {
-            IList<int> maxWidths = new List<int>();
-            for(int i = 0; i < size; i++)
-            {
-                maxWidths.Add(int.MaxValue);
-            }
-            return maxWidths;
+            if(values == null)
+                throw new ArgumentNullException("values");
+            if(values.Count() > 0 && values.First().Count() > alignments.Count())
+                throw new ArgumentException("The number of alignments must be at least as large as the number of columns.");
+            IEnumerable<Row> rows = FormatRows(values, alignments);
+            return new Table(rows);
         }
 
         /// <summary>
@@ -235,25 +229,25 @@ namespace Ngol.Utilities.TextFormat.Table
         /// <exception cref="ArgumentException">
         /// Thrown when the number of columns is unequal.
         /// </exception>
-        protected IList<Row> FormatRows(IList<IList> values, IList<Alignment> alignments)
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="values"/> is <see langword="null" />.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown if the number
+        /// of columns does not match the number of <paramref name="alignments"/>.
+        /// </exception>
+        protected IEnumerable<Row> FormatRows(IEnumerable<IEnumerable<object>> values, IEnumerable<Alignment> alignments)
         {
-            int columnCount;
-            if(values.Count == 0)
-            {
-                columnCount = 1;
-            }
-
-            else
-            {
-                columnCount = values[0].Count;
-            }
-            foreach(IList row in values)
-            {
-                if(row.Count != columnCount)
-                {
-                    throw new ArgumentException("The number of cells in the row must match the " + "declared number of columns.");
-                }
-            }
+            if(values == null)
+                throw new ArgumentNullException("values");
+            if(values.Count() > 0 && values.First().Count() > alignments.Count())
+                throw new ArgumentException("The number of alignments must be at least as large as the number of columns.");
+            if(values.Count() == 0)
+                return Enumerable.Empty<Row>();
+            IEnumerable<int> columnCounts = values.Select(row => row.Count()).Distinct();
+            if(columnCounts.Count() != 1)
+                throw new ArgumentException("Every row must have exactly the same number of cells.");
+            int columnCount = columnCounts.Single();
             return FormatRows(values, alignments, columnCount);
         }
 
@@ -270,22 +264,31 @@ namespace Ngol.Utilities.TextFormat.Table
         /// <param name="columnCount">
         /// The number of columns in the table.
         /// </param>
-        protected IList<Row> FormatRows(IList<IList> values, IList<Alignment> alignments, int columnCount)
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="values"/> is <see langword="null" />.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown if the number
+        /// of columns does not match the number of <paramref name="alignments"/>.
+        /// </exception>
+        protected IEnumerable<Row> FormatRows(IEnumerable<IEnumerable<object>> values, IEnumerable<Alignment> alignments, int columnCount)
         {
-            IList<Row> rows = new List<Row>();
+            if(values == null)
+                throw new ArgumentNullException("values");
+            if(values.Count() > 0 && values.First().Count() > alignments.Count())
+                throw new ArgumentException("The number of alignments must be at least as large as the number of columns.");
             if(TopBorder != '\0')
             {
-                rows.Add(RowSeparatorFactory.MakeInstance(TopBorder, columnCount));
+                yield return RowSeparatorFactory.MakeInstance(TopBorder, columnCount);
             }
-            foreach(IList valueRow in values)
+            foreach(IEnumerable<object> valueRow in values)
             {
-                rows.Add(RowFactory.MakeInstance(valueRow, alignments));
+                yield return RowFactory.MakeInstance(valueRow, alignments);
             }
             if(BottomBorder != '\0')
             {
-                rows.Add(RowSeparatorFactory.MakeInstance(BottomBorder, columnCount));
+                yield return RowSeparatorFactory.MakeInstance(BottomBorder, columnCount);
             }
-            return rows;
         }
 
         #endregion

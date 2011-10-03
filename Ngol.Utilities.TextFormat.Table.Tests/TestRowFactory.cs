@@ -2,7 +2,7 @@ using System;
 using NUnit.Framework;
 using Ngol.Utilities.TextFormat.Table;
 
-namespace Ngol.Utilitities.TextFormat.Table.Tests
+namespace Ngol.Utilities.TextFormat.Table.Tests
 {
     [TestFixture]
     public class TestRowFactory
@@ -10,19 +10,20 @@ namespace Ngol.Utilitities.TextFormat.Table.Tests
         private RowFactory rowFactory;
 
         [SetUp]
-        public void Setup ()
+        public void Setup()
         {
-            rowFactory = new RowFactory ('/', '|', 'X');
+            rowFactory = new RowFactory('/', '|', 'X');
         }
 
         [Test]
-        public void TestSeparators ()
+        public void TestSeparators()
         {
             char[] expected = { '/', '|', '|', '|', '|', 'X' };
-            char[] actual = rowFactory.Separators (5);
-            Assert.AreEqual (expected.Length, actual.Length);
-            for (int i = 0; i < expected.Length; i++) {
-                Assert.AreEqual (expected[i], actual[i]);
+            char[] actual = rowFactory.Separators(5);
+            Assert.AreEqual(expected.Length, actual.Length);
+            for(int i = 0; i < expected.Length; i++)
+            {
+                Assert.AreEqual(expected[i], actual[i]);
             }
         }
     }

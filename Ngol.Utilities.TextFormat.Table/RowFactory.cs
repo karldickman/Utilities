@@ -1,6 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using MoreLinq;
+using Ngol.Utilities.System;
 
 namespace Ngol.Utilities.TextFormat.Table
 {
@@ -9,26 +12,46 @@ namespace Ngol.Utilities.TextFormat.Table
     /// </summary>
     public class RowFactory
     {
+        #region Properties
+
         /// <summary>
         /// The character used to separate cells in different columns.
         /// </summary>
-        protected internal char ColumnSeparator { get; set; }
-        
+        protected char ColumnSeparator
+        {
+            get;
+            set;
+        }
+
         /// <summary>
         /// The left border of the row.
         /// </summary>
-        protected internal char LeftBorder { get; set; }
-        
+        protected char LeftBorder
+        {
+            get;
+            set;
+        }
+
         /// <summary>
         /// The right border of the row.
         /// </summary>
-        protected internal char RightBorder { get; set; }
-        
+        protected char RightBorder
+        {
+            get;
+            set;
+        }
+
+        #endregion
+
+        #region Constructors
+
         /// <summary>
         /// Create a factory that produces undecorated rows.
         /// </summary>
-        public RowFactory() : this(' ') {}
-        
+        public RowFactory() : this(' ')
+        {
+        }
+
         /// <summary>
         /// Create a factory that produces rows with the cells separated by a
         /// character.
@@ -36,9 +59,10 @@ namespace Ngol.Utilities.TextFormat.Table
         /// <param name="columnSeparator">
         /// The <see cref="System.Char"/> used to separate the columns.
         /// </param>
-        public RowFactory(char columnSeparator)
-        : this('\0', columnSeparator, '\0') {}
-        
+        public RowFactory(char columnSeparator) : this('\0', columnSeparator, '\0')
+        {
+        }
+
         /// <summary>
         /// Create a factory that produces rows with a vertical border and cells
         /// separated by a character.
@@ -49,9 +73,10 @@ namespace Ngol.Utilities.TextFormat.Table
         /// <param name="columnSeparator">
         /// The <see cref="System.Char"/> used to separate the columns.
         /// </param>
-        public RowFactory(char border, char columnSeparator)
-            : this(border, columnSeparator, border) {}
-        
+        public RowFactory(char border, char columnSeparator) : this(border, columnSeparator, border)
+        {
+        }
+
         /// <summary>
         /// Create a factory that produces rows with a vertical border and cells
         /// separated by a character.
@@ -65,27 +90,26 @@ namespace Ngol.Utilities.TextFormat.Table
         /// <param name="rightBorder">
         /// The <see cref="System.Char"/> used for the rows' right border.
         /// </param>
-        public RowFactory (char leftBorder, char columnSeparator,
-            char rightBorder)
+        public RowFactory(char leftBorder, char columnSeparator, char rightBorder)
         {
             LeftBorder = leftBorder;
             RightBorder = rightBorder;
             ColumnSeparator = columnSeparator;
         }
-        
+
+        #endregion
+
+        #region Methods
+
         /// <summary>
         /// Make a new horizontal separator.
         /// </summary>
-        public Row MakeInstance (char rowSeparator, int columnCount)
+        public Row MakeInstance(char rowSeparator, int columnCount)
         {
-            IList<ICell> cells = new HorizontalCellSeparator[columnCount];
-            for (int i = 0; i < columnCount; i++)
-            {
-                cells[i] = new HorizontalCellSeparator (rowSeparator);
-            }
-            return new Row (cells, Separators (columnCount));
+            IEnumerable<ICell> cells = Enumerable.Repeat<ICell>(new HorizontalCellSeparator(rowSeparator), columnCount);
+            return new Row(cells, Separators(columnCount));
         }
-        
+
         /// <summary>
         /// Make a new row of cells.
         /// </summary>
@@ -95,15 +119,16 @@ namespace Ngol.Utilities.TextFormat.Table
         /// <returns>
         /// A <see cref="Row"/> containing the given values.
         /// </returns>
-        public Row MakeInstance (IList values)
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="values"/> is <see langword="null" />.
+        /// </exception>
+        public Row MakeInstance(IEnumerable<object> values)
         {
-            IList<ICell> cells = new Cell[values.Count];
-            for (int i = 0; i < cells.Count; i++) {
-                cells[i] = new Cell (values[i]);
-            }
-            return MakeInstance (cells);
+            if(values == null)
+                throw new ArgumentNullException("values");
+            return MakeInstance(values.Select(value => (ICell)new Cell(value)));
         }
-        
+
         /// <summary>
         /// Make a new row of cells.
         /// </summary>
@@ -117,20 +142,25 @@ namespace Ngol.Utilities.TextFormat.Table
         /// <returns>
         /// A <see cref="Row"/> containing the given values.
         /// </returns>
-        public Row MakeInstance (IList values, IList<Alignment> alignments)
+        /// <exception cref="ArgumentException">
+        /// Thrown if the number
+        /// of columns does not match the number of <paramref name="alignments"/>.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="values"/> is <see langword="null" />.
+        /// </exception>
+        public Row MakeInstance(IEnumerable<object> values, IEnumerable<Alignment> alignments)
         {
-            if (alignments == null) 
-            {
-                return MakeInstance (values);
-            }
-            IList<ICell> cells = new Cell[values.Count];
-            for (int i = 0; i < cells.Count; i++)
-            {
-                cells[i] = new Cell (values[i], alignments[i]);
-            }
-            return MakeInstance (cells);
+            if(values == null)
+                throw new ArgumentNullException("values");
+            if(alignments == null)
+                return MakeInstance(values);
+            if(values.Count() > 0 && values.Count() > alignments.Count())
+                throw new ArgumentException("The number of alignments must be at least as large as the number of columns.");
+            IEnumerable<ICell> cells = values.Zip(alignments.Take(values.Count()), (value, alignment) => (ICell)new Cell(value, alignment));
+            return MakeInstance(cells);
         }
-        
+
         /// <summary>
         /// Make a new row of cells.
         /// </summary>
@@ -140,11 +170,11 @@ namespace Ngol.Utilities.TextFormat.Table
         /// <returns>
         /// A <see cref="Row"/> containing the given cells.
         /// </returns>
-        public Row MakeInstance (IList<ICell> cells)
+        public Row MakeInstance(IEnumerable<ICell> cells)
         {
-            return new Row (cells, Separators (cells.Count));
+            return new Row(cells, Separators(cells.Count()));
         }
-        
+
         /// <summary>
         /// The separators needed for this row.
         /// </summary>
@@ -155,10 +185,10 @@ namespace Ngol.Utilities.TextFormat.Table
         /// A <see cref="System.Char[]"/>.  The separators for the required
         /// number of columns.
         /// </returns>
-        public char[] Separators (int columnCount)
+        public char[] Separators(int columnCount)
         {
             char[] separators = new char[columnCount + 1];
-            for (int i = 0; i < columnCount; i++)
+            for(int i = 0; i < columnCount; i++)
             {
                 separators[i] = ColumnSeparator;
             }
@@ -166,5 +196,7 @@ namespace Ngol.Utilities.TextFormat.Table
             separators[columnCount] = RightBorder;
             return separators;
         }
+
+        #endregion
     }
 }

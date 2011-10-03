@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using Ngol.Utilities.Collections.Extensions;
 
 namespace Ngol.Utilities.TextFormat.Table
 {
@@ -59,8 +61,13 @@ namespace Ngol.Utilities.TextFormat.Table
         /// <exception cref="ArgumentException">
         /// Thrown when any of the rows has the wrong number of cells.
         /// </exception>
-        public new IList<string> Format(IList<IList> values)
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="values"/> is <see langword="null" />.
+        /// </exception>
+        public new Table Format(IEnumerable<IEnumerable<object>> values)
         {
+            if(values == null)
+                throw new ArgumentNullException("values");
             return Format(values, null);
         }
 
@@ -74,10 +81,18 @@ namespace Ngol.Utilities.TextFormat.Table
         /// The sequence of alignments in the table.
         /// </param>
         /// <exception cref="ArgumentException">
-        /// Thrown when any of the rows has the wrong number of cells.
+        /// Thrown when any of the rows has the wrong number of cells, or if the number
+        /// of columns does not match the number of <paramref name="alignments"/>.
         /// </exception>
-        public new IList<string> Format(IList<IList> values, IList<Alignment> alignments)
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="values"/> is <see langword="null" />.
+        /// </exception>
+        public new Table Format(IEnumerable<IEnumerable<object>> values, IEnumerable<Alignment> alignments)
         {
+            if(values == null)
+                throw new ArgumentNullException("values");
+            if(values.Count() > 0 && values.First().Count() > alignments.Count())
+                throw new ArgumentException("The number of alignments must be at least as large as the number of columns.");
             return Format(null, values, alignments);
         }
 
@@ -93,9 +108,14 @@ namespace Ngol.Utilities.TextFormat.Table
         /// <exception cref="ArgumentException">
         /// Thrown when any of the rows has the wrong number of cells.
         /// </exception>
-        public IList<string> Format(IList header, IList<IList> values)
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="values"/> is <see langword="null" />.
+        /// </exception>
+        public Table Format(IEnumerable<object> header, IEnumerable<IEnumerable<object>> values)
         {
-            return Format(header, values, (IList)null);
+            if(values == null)
+                throw new ArgumentNullException("values");
+            return Format(header, values, (IEnumerable<object>)null);
         }
 
         /// <summary>
@@ -111,10 +131,18 @@ namespace Ngol.Utilities.TextFormat.Table
         /// The alignments of the columns.
         /// </param>
         /// <exception cref="ArgumentException">
-        /// Thrown when any of the rows has the wrong number of cells.
+        /// Thrown when any of the rows has the wrong number of cells, or if the number
+        /// of columns does not match the number of <paramref name="alignments"/>.
         /// </exception>
-        public IList<string> Format(IList header, IList<IList> values, IList<Alignment> alignments)
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="values"/> is <see langword="null" />.
+        /// </exception>
+        public Table Format(IEnumerable<object> header, IEnumerable<IEnumerable<object>> values, IEnumerable<Alignment> alignments)
         {
+            if(values == null)
+                throw new ArgumentNullException("values");
+            if(values.Count() > 0 && values.First().Count() > alignments.Count())
+                throw new ArgumentException("The number of alignments must be at least as large as the number of columns.");
             return Format(header, values, null, alignments);
         }
 
@@ -133,8 +161,13 @@ namespace Ngol.Utilities.TextFormat.Table
         /// <exception cref="ArgumentException">
         /// Thrown when any of the rows has the wrong number of cells.
         /// </exception>
-        public IList<string> Format(IList header, IList<IList> values, IList footer)
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="values"/> is <see langword="null" />.
+        /// </exception>
+        public Table Format(IEnumerable<object> header, IEnumerable<IEnumerable<object>> values, IEnumerable<object> footer)
         {
+            if(values == null)
+                throw new ArgumentNullException("values");
             return Format(header, values, footer, null);
         }
 
@@ -154,16 +187,20 @@ namespace Ngol.Utilities.TextFormat.Table
         /// The alignments in the table.
         /// </param>
         /// <exception cref="ArgumentException">
-        /// Thrown when any of the rows has the wrong number of cells.
+        /// Thrown when any of the rows has the wrong number of cells, or if the number
+        /// of columns does not match the number of <paramref name="alignments"/>.
         /// </exception>
-        public IList<string> Format(IList header, IList<IList> values, IList footer, IList<Alignment> alignments)
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="values"/> is <see langword="null" />.
+        /// </exception>
+        public Table Format(IEnumerable<object> header, IEnumerable<IEnumerable<object>> values, IEnumerable<object> footer, IEnumerable<Alignment> alignments)
         {
-            IList<Row> rows = FormatRows(header, values, footer, alignments);
-            if(rows.Count == 0)
-            {
-                return new List<string>();
-            }
-            return new Table(rows, GetDefaultMaxWidths(rows[0].ColumnCount)).Lines();
+            if(values == null)
+                throw new ArgumentNullException("values");
+            if(values.Count() > 0 && values.First().Count() > alignments.Count())
+                throw new ArgumentException("The number of alignments must be at least as large as the number of columns.");
+            IEnumerable<Row> rows = FormatRows(header, values, footer, alignments);
+            return new Table(rows);
         }
 
         /// <summary>
@@ -182,31 +219,37 @@ namespace Ngol.Utilities.TextFormat.Table
         /// The alignments in the table.
         /// </param>
         /// <exception cref="ArgumentException">
-        /// Thrown when any of the rows has the wrong number of cells.
+        /// Thrown when any of the rows has the wrong number of cells, or if the number
+        /// of columns does not match the number of <paramref name="alignments"/>.
         /// </exception>
-        protected IList<Row> FormatRows(IList header, IList<IList> values, IList footer, IList<Alignment> alignments)
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="values"/> is <see langword="null" />.
+        /// </exception>
+        protected IEnumerable<Row> FormatRows(IEnumerable<object> header, IEnumerable<IEnumerable<object>> values, IEnumerable<object> footer, IEnumerable<Alignment> alignments)
         {
+            if(values == null)
+                throw new ArgumentNullException("values");
+            if(values.Count() > 0 && values.First().Count() > alignments.Count())
+                throw new ArgumentException("The number of alignments must be at least as large as the number of columns.");
             int columnCount;
             //Get the number of columns
             if(header != null)
             {
-                columnCount = header.Count;
+                columnCount = header.Count();
             }
-
-
             else if(footer != null)
             {
-                columnCount = footer.Count;
+                columnCount = footer.Count();
             }
-            else if(values.Count > 0)
+            else if(values.Count() > 0)
             {
-                columnCount = values[0].Count;
+                columnCount = values.First().Count();
             }
             else
             {
                 return new List<Row>();
             }
-            if(header != null && header.Count != columnCount || footer != null && footer.Count != columnCount)
+            if(header != null && header.Count() != columnCount || footer != null && footer.Count() != columnCount)
             {
                 throw new ArgumentException("All column counts must be equal.");
             }
@@ -231,10 +274,21 @@ namespace Ngol.Utilities.TextFormat.Table
         /// <param name="columnCount">
         /// The number of columns.
         /// </param>
-        protected IList<Row> FormatRows(IList header, IList<IList> values, IList footer, IList<Alignment> alignments, int columnCount)
+        /// <exception cref="ArgumentException">
+        /// Thrown if the number
+        /// of columns does not match the number of <paramref name="alignments"/>.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="values"/> is <see langword="null" />.
+        /// </exception>
+        protected IEnumerable<Row> FormatRows(IEnumerable<object> header, IEnumerable<IEnumerable<object>> values, IEnumerable<object> footer, IEnumerable<Alignment> alignments, int columnCount)
         {
-            List<Row> rows = new List<Row>();
-            IList<Row> bodyRows = base.FormatRows(values, alignments, columnCount);
+            if(values == null)
+                throw new ArgumentNullException("values");
+            if(values.Count() > 0 && values.First().Count() > alignments.Count())
+                throw new ArgumentException("The number of alignments must be at least as large as the number of columns.");
+            IList<Row> rows = new List<Row>();
+            IEnumerable<Row> bodyRows = base.FormatRows(values, alignments, columnCount);
             if(TopBorder != '\0')
             {
                 rows.Add(RowSeparatorFactory.MakeInstance(TopBorder, columnCount));
@@ -245,7 +299,7 @@ namespace Ngol.Utilities.TextFormat.Table
             }
             else if(base.TopBorder != '\0')
             {
-                bodyRows.RemoveAt(0);
+                bodyRows = bodyRows.Skip(1);
             }
             rows.AddRange(bodyRows);
             if(footer != null)

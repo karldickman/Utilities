@@ -1,5 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using Ngol.Utilities.Collections.Extensions;
 
 namespace Ngol.Utilities.TextFormat.Table
 {
@@ -13,19 +16,19 @@ namespace Ngol.Utilities.TextFormat.Table
         /// <summary>
         /// The cells in the row.
         /// </summary>
-        IList<ICell> Cells
+        public IEnumerable<ICell> Cells
         {
             get;
-            set;
+            protected set;
         }
 
         /// <summary>
         /// The separators between the cells.
         /// </summary>
-        IList<char> Separators
+        public IEnumerable<char> Separators
         {
             get;
-            set;
+            protected set;
         }
 
         /// <summary>
@@ -33,7 +36,7 @@ namespace Ngol.Utilities.TextFormat.Table
         /// </summary>
         public int ColumnCount
         {
-            get { return Cells.Count; }
+            get { return Cells.Count(); }
         }
 
         #endregion
@@ -46,12 +49,33 @@ namespace Ngol.Utilities.TextFormat.Table
         /// <param name="cells">
         /// The cells in the row.
         /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if any argument is <see langword="null" />.
+        /// </exception>
+        public Row(IEnumerable<ICell> cells) : this(cells, Enumerable.Repeat<char>('\0', cells.Count()))
+        {
+        }
+
+        /// <summary>
+        /// Create a new row.
+        /// </summary>
+        /// <param name="cells">
+        /// The cells in the row.
+        /// </param>
         /// <param name="separators">
         /// The separators between the cells.
         /// </param>
-        public Row(IList<ICell> cells, IList<char> separators)
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if any argument is <see langword="null" />.
+        /// </exception>
+        public Row(IEnumerable<ICell> cells, IEnumerable<char> separators)
         {
-            Cells = cells;
+            if(cells == null)
+                throw new ArgumentNullException("cells");
+            if(separators == null)
+                throw new ArgumentNullException("separators");
+            // Convert to list to avoid odd behaviors
+            Cells = cells.ToList();
             Separators = separators;
         }
 
@@ -60,54 +84,54 @@ namespace Ngol.Utilities.TextFormat.Table
         #region Methods
 
         /// <summary>
-        /// Get the width of colum i, zero-indexed.
+        /// Get the widths of all the columns.
         /// </summary>
-        public int ColumnWidth(int column)
+        public IEnumerable<int> GetColumnWidths()
         {
-            return Cells[column].GetWidth();
+            return Cells.Select(cell => cell.GetWidth());
         }
 
         /// <summary>
         /// Pad all cells in the row to the given widths.
         /// </summary>
         /// <exception cname="ArgumentException">
-        /// Raised when an incorrect number of width is provided for the cells
-        /// in the row.
+        /// Raised when more cells are provided than widths.
         /// </exception>
-        public void Pad(IList<int> widths)
+        public void Pad(IEnumerable<int> widths)
         {
-            if(Cells.Count != widths.Count)
-            {
-                throw new ArgumentException("The number of cells must match the nubmer of widths.");
-            }
-            for(int i = 0; i < Cells.Count; i++)
-            {
-                Cells[i].Pad(widths[i]);
-            }
+            if(widths == null)
+                throw new ArgumentNullException("widths");
+            if(Cells.Count() > widths.Count())
+                throw new ArgumentException("A width must be specified for every cell.");
+            Cells.ForEachEqual(widths.Take(ColumnCount), (cell, width) => { cell.Pad(width); });
         }
+
+        #endregion
+
+        #region Inherited methods
 
         /// <summary>
         /// Format the row.
         /// </summary>
         public override string ToString()
         {
-            int i;
+            Debug.Assert(Cells.Count() + 1 == Separators.Count());
             string result = "";
-            for(i = 0; i < Cells.Count; i++)
+            Cells.ForEach(Separators, (cell, separator) =>
             {
-                if(Separators[i] != '\0')
+                if(separator != '\0')
                 {
-                    result += Separators[i];
+                    result += separator;
                 }
-                result += Cells[i];
-            }
-            if(Separators[i] != '\0')
+                result += cell;
+            });
+            if(Separators.Last() != '\0')
             {
-                result += Separators[i];
+                result += Separators.Last();
             }
             return result;
         }
-
+        
         #endregion
     }
 }

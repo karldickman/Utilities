@@ -1,45 +1,49 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Ngol.Utilities.NUnit;
 using Ngol.Utilities.TextFormat.Table;
 using NUnit.Framework;
 
-namespace Ngol.Utilitities.TextFormat.Table.Tests
-{ 
+namespace Ngol.Utilities.TextFormat.Table.Tests
+{
     [TestFixture]
     public class TestLabeledTableFormatter
     {
-        protected LabeledTableFormatter Formatter { get; set; }
-        [SetUp]
-        public void TestSetUp ()
+        protected LabeledTableFormatter Formatter
         {
-            Formatter = new PrettyTableFormatter ();
+            get;
+            set;
         }
-        
-        [Test]
-        public void TestFormat ()
+        [SetUp]
+        public void TestSetUp()
         {
-            IList label = new ArrayList ();
-            label.Add ("thing");
-            label.Add ("stuff");
-            IList<IList> empty = new List<IList> ();
-            IList<string> actual;
-            actual = Formatter.Format (empty);
-            Assert.AreEqual (0, actual.Count);
-            actual = Formatter.Format (label, empty);
-            Assert.AreEqual (4, actual.Count);
-            actual = Formatter.Format (null, empty, label);
-            Assert.AreEqual (4, actual.Count);
-            actual = Formatter.Format (label, empty, label);
-            Assert.AreEqual (6, actual.Count);
+            Formatter = new PrettyTableFormatter();
+        }
+
+        [Test]
+        public void TestFormat()
+        {
+            IEnumerable<object> label = new List<object> { "thing", "stuff", };
+            IEnumerable<IEnumerable<object>> empty = new List<IEnumerable<object>>();
+            IEnumerable<string> actual;
+            actual = Formatter.Format(empty);
+            MoreAssert.IsEmpty(actual);
+            actual = Formatter.Format(label, empty);
+            MoreAssert.HasCount(4, actual);
+            actual = Formatter.Format(null, empty, label);
+            MoreAssert.HasCount(4, actual);
+            actual = Formatter.Format(label, empty, label);
+            MoreAssert.HasCount(6, actual);
             try
             {
-                IList list = new ArrayList ();
-                list.Add ("xkcd");
-                actual = Formatter.Format (label, empty, list);
-                Assert.Fail ("Attempting to use different sized headers and footers should not be allowed.");
+                IEnumerable<object> list = new List<object> { "xkcd", };
+                actual = Formatter.Format(label, empty, list);
+                Assert.Fail("Attempting to use different sized headers and footers should not be allowed.");
             }
-            catch (ArgumentException) {}
+            catch(ArgumentException)
+            {
+            }
         }
     }
 }

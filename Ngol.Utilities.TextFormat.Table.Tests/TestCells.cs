@@ -3,7 +3,7 @@ using NUnit.Framework;
 using Ngol.Utilities.TextFormat;
 using Ngol.Utilities.TextFormat.Table;
 
-namespace Ngol.Utilitities.TextFormat.Table.Tests
+namespace Ngol.Utilities.TextFormat.Table.Tests
 {
     [TestFixture]
     public class TestHorizontalCellSeparator
