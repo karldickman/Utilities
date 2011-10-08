@@ -312,7 +312,7 @@ namespace Ngol.Utilities.Collections.Extensions
         /// </exception>
         public static void ForEach<T1, T2>(this IEnumerable<T1> first, IEnumerable<T2> second, Action<T1, T2> action)
         {
-            MoreEnumerable.ForEach(MoreEnumerable.Zip<T1, T2, Tuple<T1, T2>>(first, second, Tuple.Create<T1, T2>), pair => action<T1, T2>(pair.Item1, pair.Item2));
+            MoreEnumerable.ForEach(MoreEnumerable.Zip<T1, T2, Tuple<T1, T2>>(first, second, Tuple.Create<T1, T2>), pair => action(pair.Item1, pair.Item2));
         }
 
         /// <summary>
@@ -340,7 +340,7 @@ namespace Ngol.Utilities.Collections.Extensions
         /// </exception>
         public static void ForEachEqual<T1, T2>(this IEnumerable<T1> first, IEnumerable<T2> second, Action<T1, T2> action)
         {
-            MoreEnumerable.ForEach(MoreEnumerable.EquiZip<T1, T2, Tuple<T1, T2>>(first, second, Tuple.Create<T1, T2>), pair => action<T1, T2>(pair.Item1, pair.Item2));
+            MoreEnumerable.ForEach(MoreEnumerable.EquiZip<T1, T2, Tuple<T1, T2>>(first, second, Tuple.Create<T1, T2>), pair => action(pair.Item1, pair.Item2));
         }
 
         /// <summary>
@@ -437,7 +437,7 @@ namespace Ngol.Utilities.Collections.Extensions
         /// </exception>
         public static void ForEachLongest<T1, T2>(this IEnumerable<T1> first, IEnumerable<T2> second, Action<T1, T2> action)
         {
-            MoreEnumerable.ForEach(MoreEnumerable.ZipLongest<T1, T2, Tuple<T1, T2>>(first, second, Tuple.Create<T1, T2>), pair => action<T1, T2>(pair.Item1, pair.Item2));
+            MoreEnumerable.ForEach(MoreEnumerable.ZipLongest<T1, T2, Tuple<T1, T2>>(first, second, Tuple.Create<T1, T2>), pair => action(pair.Item1, pair.Item2));
         }
 
         /// <summary>

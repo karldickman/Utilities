@@ -176,7 +176,7 @@ namespace Ngol.Utilities.System
         #region Inherited methods
 
         /// <summary>
-        /// Overload of == operator that delegates to <see cref="Equals(object)" />.
+        /// Overload of == operator that delegates to the Equals method.
         /// </summary>
         public static bool operator ==(Tuple<T1> tuple1, Tuple<T1> tuple2)
         {
@@ -192,7 +192,7 @@ namespace Ngol.Utilities.System
         }
 
         /// <summary>
-        /// Overload of != operator that delegates to <see cref="Equals(object)" />.
+        /// Overload of != operator that delegates to the Equals method.
         /// </summary>
         public static bool operator !=(Tuple<T1> tuple1, Tuple<T1> tuple2)
         {
@@ -247,12 +247,12 @@ namespace Ngol.Utilities.System
 
         int IComparable.CompareTo(object other)
         {
-            Tuple<T1> that = other as Tuple<T1>;
+            Tuple<T1 > that = other as Tuple<T1>;
             if(that == null)
             {
                 throw new ArgumentException("Expected object of type Tuple<T1>.");
             }
-            Comparer<T1> comparer = Comparer<T1>.Default;
+            Comparer<T1 > comparer = Comparer<T1>.Default;
             return comparer.Compare(Item1, that.Item1);
         }
 
@@ -300,7 +300,7 @@ namespace Ngol.Utilities.System
         #region Inherited methods
 
         /// <summary>
-        /// Overload of == operator that delegates to <see cref="Equals(object)" />.
+        /// Overload of == operator that delegates to the Equals method.
         /// </summary>
         public static bool operator ==(Tuple<T1, T2> tuple1, Tuple<T1, T2> tuple2)
         {
@@ -316,7 +316,7 @@ namespace Ngol.Utilities.System
         }
 
         /// <summary>
-        /// Overload of != operator that delegates to <see cref="Equals(object)" />.
+        /// Overload of != operator that delegates to the Equals method.
         /// </summary>
         public static bool operator !=(Tuple<T1, T2> tuple1, Tuple<T1, T2> tuple2)
         {
@@ -371,7 +371,7 @@ namespace Ngol.Utilities.System
 
         int IComparable.CompareTo(object other)
         {
-            Tuple<T1, T2> that = other as Tuple<T1, T2>;
+            Tuple<T1, T2 > that = other as Tuple<T1, T2>;
             if(that == null)
             {
                 throw new ArgumentNullException("Expected object of type Tuple<T1, T2>");
@@ -437,7 +437,7 @@ namespace Ngol.Utilities.System
         #region Inherited methods
 
         /// <summary>
-        /// Overload of == operator that delegates to <see cref="Equals(object)" />.
+        /// Overload of == operator that delegates to the Equals method.
         /// </summary>
         public static bool operator ==(Tuple<T1, T2, T3> tuple1, Tuple<T1, T2, T3> tuple2)
         {
@@ -453,7 +453,7 @@ namespace Ngol.Utilities.System
         }
 
         /// <summary>
-        /// Overload of != operator that delegates to <see cref="Equals(object)" />.
+        /// Overload of != operator that delegates to the Equals method.
         /// </summary>
         public static bool operator !=(Tuple<T1, T2, T3> tuple1, Tuple<T1, T2, T3> tuple2)
         {
@@ -508,7 +508,7 @@ namespace Ngol.Utilities.System
 
         int IComparable.CompareTo(object other)
         {
-            Tuple<T1, T2, T3> that = other as Tuple<T1, T2, T3>;
+            Tuple<T1, T2, T3 > that = other as Tuple<T1, T2, T3>;
             if(that == null)
             {
                 throw new ArgumentNullException("Expected object of type Tuple<T1, T2, T3>");

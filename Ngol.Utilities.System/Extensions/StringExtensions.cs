@@ -10,7 +10,7 @@ namespace Ngol.Utilities.System.Extensions
     public static class StringExtensions
     {
         /// <summary>
-        /// Similar to <see cref="string.Join(string, string[])" /> but allows any kind
+        /// Similar to string.Join() but allows any kind
         /// of enumerable.
         /// </summary>
         /// <exception cref="ArgumentNullException">
