@@ -312,7 +312,20 @@ namespace Ngol.Utilities.Collections.Extensions
         /// </exception>
         public static void ForEach<T1, T2>(this IEnumerable<T1> first, IEnumerable<T2> second, Action<T1, T2> action)
         {
-            MoreEnumerable.ForEach(MoreEnumerable.Zip<T1, T2, Tuple<T1, T2>>(first, second, Tuple.Create<T1, T2>), pair => action(pair.Item1, pair.Item2));
+            if(first == null)
+            {
+                throw new ArgumentNullException("first");
+            }
+            if(second == null)
+            {
+                throw new ArgumentNullException("second");
+            }
+            if(action == null)
+            {
+                throw new ArgumentNullException("action");
+            }
+            first.Zip(second, Tuple.Create<T1, T2>)
+                 .ForEach(pair => action(pair.Item1, pair.Item2));
         }
 
         /// <summary>
@@ -775,8 +788,14 @@ namespace Ngol.Utilities.Collections.Extensions
         public static IEnumerable<TOut> Pairs<TIn, TOut>(this IEnumerable<TIn> iterable, Func<TIn, TIn, TOut> selector)
         {
             if(iterable == null)
+            {
                 throw new ArgumentNullException("iterable");
-            return MoreEnumerable.Zip(iterable, iterable.Skip(1), selector);
+            }
+            if(selector == null)
+            {
+                throw new ArgumentNullException("selector");
+            }
+            return iterable.Zip(iterable.Skip(1), selector);
         }
 
         /// <summary>
@@ -816,8 +835,24 @@ namespace Ngol.Utilities.Collections.Extensions
         /// </exception>
         public static IEnumerable<TOut> Zip<TIn1, TIn2, TIn3, TOut>(this IEnumerable<TIn1> first, IEnumerable<TIn2> second, IEnumerable<TIn3> third, Func<TIn1, TIn2, TIn3, TOut> selector)
         {
-            return MoreEnumerable.Zip<TIn1, TIn2, Tuple<TIn1, TIn2>>(first, second, Tuple.Create<TIn1, TIn2>)
-                                 .Zip(third, (tuple, value3) => selector(tuple.Item1, tuple.Item2, value3));
+            if(first == null)
+            {
+                throw new ArgumentNullException("first");
+            }
+            if(second == null)
+            {
+                throw new ArgumentNullException("second");
+            }
+            if(third == null)
+            {
+                throw new ArgumentNullException("third");
+            }
+            if(selector == null)
+            {
+                throw new ArgumentNullException("selector");
+            }
+            return first.Zip(second, Tuple.Create<TIn1, TIn2>)
+                        .Zip(third, (tuple, value3) => selector(tuple.Item1, tuple.Item2, value3));
         }
 
 
@@ -861,7 +896,24 @@ namespace Ngol.Utilities.Collections.Extensions
         /// </exception>
         public static IEnumerable<TOut> EquiZip<TIn1, TIn2, TIn3, TOut>(this IEnumerable<TIn1> first, IEnumerable<TIn2> second, IEnumerable<TIn3> third, Func<TIn1, TIn2, TIn3, TOut> selector)
         {
-            return MoreEnumerable.Zip<TIn1, TIn2, Tuple<TIn1, TIn2>>(first, second, Tuple.Create<TIn1, TIn2>).Zip(third, (tuple, value3) => selector(tuple.Item1, tuple.Item2, value3));
+            if(first == null)
+            {
+                throw new ArgumentNullException("first");
+            }
+            if(second == null)
+            {
+                throw new ArgumentNullException("second");
+            }
+            if(third == null)
+            {
+                throw new ArgumentNullException("third");
+            }
+            if(selector == null)
+            {
+                throw new ArgumentNullException("selector");
+            }
+            return first.EquiZip(second, Tuple.Create<TIn1, TIn2>)
+                        .EquiZip(third, (tuple, value3) => selector(tuple.Item1, tuple.Item2, value3));
         }
 
         /// <summary>
@@ -901,7 +953,24 @@ namespace Ngol.Utilities.Collections.Extensions
         /// </exception>
         public static IEnumerable<TOut> ZipLongest<TIn1, TIn2, TIn3, TOut>(this IEnumerable<TIn1> first, IEnumerable<TIn2> second, IEnumerable<TIn3> third, Func<TIn1, TIn2, TIn3, TOut> selector)
         {
-            return MoreEnumerable.Zip<TIn1, TIn2, Tuple<TIn1, TIn2>>(first, second, Tuple.Create<TIn1, TIn2>).Zip(third, (tuple, value3) => selector(tuple.Item1, tuple.Item2, value3));
+            if(first == null)
+            {
+                throw new ArgumentNullException("first");
+            }
+            if(second == null)
+            {
+                throw new ArgumentNullException("second");
+            }
+            if(third == null)
+            {
+                throw new ArgumentNullException("third");
+            }
+            if(selector == null)
+            {
+                throw new ArgumentNullException("selector");
+            }
+            return first.ZipLongest(second, Tuple.Create<TIn1, TIn2>)
+                        .ZipLongest(third, (tuple, value3) => selector(tuple.Item1, tuple.Item2, value3));
         }
     }
 }
