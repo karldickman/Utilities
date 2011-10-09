@@ -51,6 +51,7 @@
     <Compile Include="Collections\Generic\Dictionary.cs" />
     <Compile Include="Extensions\IDisposableExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
+    <Compile Include="Extensions\CharExtensions.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

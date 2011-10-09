@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using Ngol.Utilities.Collections.Extensions;
 
@@ -11,6 +12,40 @@ namespace Ngol.Utilities.TextFormat.Table
     /// </summary>
     public class LabeledTableFormatter : TableFormatter
     {
+        #region Properties
+
+        /// <inheritdoc />
+        public new string BottomBorder
+        {
+            get { return BorderCharToString(BottomBorderChar); }
+        }
+
+        /// <inheritdoc />
+        public new bool HasBottomBorder
+        {
+            get { return BottomBorderChar != '\0'; }
+        }
+
+        /// <inheritdoc />
+        public new bool HasTopBorder
+        {
+            get { return TopBorderChar != '\0'; }
+        }
+
+        /// <inheritdoc />
+        public new string TopBorder
+        {
+            get { return BorderCharToString(TopBorderChar); }
+        }
+
+        /// <inheritdoc />
+        protected new char BottomBorderChar { get; set; }
+
+        /// <inheritdoc />
+        protected new char TopBorderChar { get; set; }
+
+        #endregion
+
         #region Constructors
 
         /// <summary>
@@ -44,8 +79,8 @@ namespace Ngol.Utilities.TextFormat.Table
         /// </param>
         public LabeledTableFormatter(char leftBorder, char columnSeparator, char rightBorder, char topBorder, char bottomBorder, char bodyTop, char bodyBottom, char corner) : base(leftBorder, columnSeparator, rightBorder, bodyTop, bodyBottom, corner)
         {
-            BottomBorder = bottomBorder;
-            TopBorder = topBorder;
+            BottomBorderChar = bottomBorder;
+            TopBorderChar = topBorder;
         }
 
         #endregion
@@ -55,7 +90,7 @@ namespace Ngol.Utilities.TextFormat.Table
         /// <summary>
         /// Format some objects into a table.
         /// </summary>
-        /// <param name="values">
+        /// <param name="table">
         /// The sequence of values in the table.
         /// </param>
         /// <exception cref="ArgumentException">
@@ -64,17 +99,19 @@ namespace Ngol.Utilities.TextFormat.Table
         /// <exception cref="ArgumentNullException">
         /// Thrown if <paramref name="values"/> is <see langword="null" />.
         /// </exception>
-        public new Table Format(IEnumerable<IEnumerable<object>> values)
+        public new IEnumerable<string> Format(DataTable table)
         {
-            if(values == null)
+            if(table == null)
+            {
                 throw new ArgumentNullException("values");
-            return Format(values, null);
+            }
+            return Format(table, StringFormatting.LeftPadded);
         }
 
         /// <summary>
         /// Format some objects into a table.
         /// </summary>
-        /// <param name="values">
+        /// <param name="table">
         /// The sequence of values in the table.
         /// </param>
         /// <param name="alignments">
@@ -87,236 +124,67 @@ namespace Ngol.Utilities.TextFormat.Table
         /// <exception cref="ArgumentNullException">
         /// Thrown if <paramref name="values"/> is <see langword="null" />.
         /// </exception>
-        public new Table Format(IEnumerable<IEnumerable<object>> values, IEnumerable<Alignment> alignments)
+        public new IEnumerable<string> Format(DataTable table, IEnumerable<Func<object, int, string>> alignments)
         {
-            if(values == null)
-                throw new ArgumentNullException("values");
-            if(values.Count() > 0 && values.First().Count() > alignments.Count())
+            if(table == null)
+            {
+                throw new ArgumentNullException("table");
+            }
+            if(alignments == null)
+            {
+                throw new ArgumentNullException("alignments");
+            }
+            if(table.Columns.Count > alignments.Count())
+            {
                 throw new ArgumentException("The number of alignments must be at least as large as the number of columns.");
-            return Format(null, values, alignments);
+            }
+            IEnumerable<string > headers = GetHeaders(table);
+            IEnumerable<int > columnWidths = GetColumnWidths(table);
+            if(HasTopBorder)
+            {
+                yield return GetRowSeparator(TopBorderChar, columnWidths);
+            }
+            yield return FormatRow(headers, columnWidths);
+            foreach(string row in base.Format(table, alignments))
+            {
+                yield return row;
+            }
+            if(HasBottomBorder)
+            {
+                yield return GetRowSeparator(BottomBorderChar, columnWidths);
+            }
         }
 
         /// <summary>
-        /// Format some objects into a table.
+        /// Find the widths in characters for all the columns
+        /// in the given <see cref="DataTable" />.
         /// </summary>
-        /// <param name="header">
-        /// The heading of the table.
+        /// <param name="table">
+        /// The <see cref="DataTable" /> whose column widths to find.
         /// </param>
-        /// <param name="values">
-        /// The sequence of values in the table.
-        /// </param>
-        /// <exception cref="ArgumentException">
-        /// Thrown when any of the rows has the wrong number of cells.
-        /// </exception>
         /// <exception cref="ArgumentNullException">
-        /// Thrown if <paramref name="values"/> is <see langword="null" />.
+        /// Thrown if <paramref name="table"/> is <see langword="null" /> .
         /// </exception>
-        public Table Format(IEnumerable<object> header, IEnumerable<IEnumerable<object>> values)
+        protected new IEnumerable<int> GetColumnWidths(DataTable table)
         {
-            if(values == null)
-                throw new ArgumentNullException("values");
-            return Format(header, values, (IEnumerable<object>)null);
+            if(table == null)
+            {
+                throw new ArgumentNullException("table");
+            }
+            IEnumerable<int > columnWidths = base.GetColumnWidths(table);
+            IEnumerable<int> headerWidths = GetHeaders(table).Select(header => header.ToString().Length);
+            return columnWidths.Zip(headerWidths, Math.Max);
         }
 
-        /// <summary>
-        /// Format some objects into a table.
-        /// </summary>
-        /// <param name="header">
-        /// The heading of the table.
-        /// </param>
-        /// <param name="values">
-        /// The sequence of values in the table.
-        /// </param>
-        /// <param name="alignments">
-        /// The alignments of the columns.
-        /// </param>
-        /// <exception cref="ArgumentException">
-        /// Thrown when any of the rows has the wrong number of cells, or if the number
-        /// of columns does not match the number of <paramref name="alignments"/>.
-        /// </exception>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown if <paramref name="values"/> is <see langword="null" />.
-        /// </exception>
-        public Table Format(IEnumerable<object> header, IEnumerable<IEnumerable<object>> values, IEnumerable<Alignment> alignments)
+        IEnumerable<string> GetHeaders(DataTable table)
         {
-            if(values == null)
-                throw new ArgumentNullException("values");
-            if(values.Count() > 0 && values.First().Count() > alignments.Count())
-                throw new ArgumentException("The number of alignments must be at least as large as the number of columns.");
-            return Format(header, values, null, alignments);
+            if(table == null)
+            {
+                throw new ArgumentNullException("table");
+            }
+            return table.Columns.Cast<DataColumn>().Select(column => column.ColumnName);
         }
 
-        /// <summary>
-        /// Format some objects into a table.
-        /// </summary>
-        /// <param name="header">
-        /// The heading of the table.
-        /// </param>
-        /// <param name="values">
-        /// The sequence of values in the table.
-        /// </param>
-        /// <param name="footer">
-        /// The footer of the table.
-        /// </param>
-        /// <exception cref="ArgumentException">
-        /// Thrown when any of the rows has the wrong number of cells.
-        /// </exception>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown if <paramref name="values"/> is <see langword="null" />.
-        /// </exception>
-        public Table Format(IEnumerable<object> header, IEnumerable<IEnumerable<object>> values, IEnumerable<object> footer)
-        {
-            if(values == null)
-                throw new ArgumentNullException("values");
-            return Format(header, values, footer, null);
-        }
-
-        /// <summary>
-        /// Format some objects into a table.
-        /// </summary>
-        /// <param name="header">
-        /// The heading of the table.
-        /// </param>
-        /// <param name="values">
-        /// The sequence of values in teh table.
-        /// </param>
-        /// <param name="footer">
-        /// The footer of the table.
-        /// </param>
-        /// <param name="alignments">
-        /// The alignments in the table.
-        /// </param>
-        /// <exception cref="ArgumentException">
-        /// Thrown when any of the rows has the wrong number of cells, or if the number
-        /// of columns does not match the number of <paramref name="alignments"/>.
-        /// </exception>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown if <paramref name="values"/> is <see langword="null" />.
-        /// </exception>
-        public Table Format(IEnumerable<object> header, IEnumerable<IEnumerable<object>> values, IEnumerable<object> footer, IEnumerable<Alignment> alignments)
-        {
-            if(values == null)
-                throw new ArgumentNullException("values");
-            if(values.Count() > 0 && values.First().Count() > alignments.Count())
-                throw new ArgumentException("The number of alignments must be at least as large as the number of columns.");
-            IEnumerable<Row> rows = FormatRows(header, values, footer, alignments);
-            return new Table(rows);
-        }
-
-        /// <summary>
-        /// Format some objects into a table.
-        /// </summary>
-        /// <param name="header">
-        /// The heading of the table.
-        /// </param>
-        /// <param name="values">
-        /// The sequence of values in teh table.
-        /// </param>
-        /// <param name="footer">
-        /// The footer of the table.
-        /// </param>
-        /// <param name="alignments">
-        /// The alignments in the table.
-        /// </param>
-        /// <exception cref="ArgumentException">
-        /// Thrown when any of the rows has the wrong number of cells, or if the number
-        /// of columns does not match the number of <paramref name="alignments"/>.
-        /// </exception>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown if <paramref name="values"/> is <see langword="null" />.
-        /// </exception>
-        protected IEnumerable<Row> FormatRows(IEnumerable<object> header, IEnumerable<IEnumerable<object>> values, IEnumerable<object> footer, IEnumerable<Alignment> alignments)
-        {
-            if(values == null)
-                throw new ArgumentNullException("values");
-            if(values.Count() > 0 && values.First().Count() > alignments.Count())
-                throw new ArgumentException("The number of alignments must be at least as large as the number of columns.");
-            int columnCount;
-            //Get the number of columns
-            if(header != null)
-            {
-                columnCount = header.Count();
-            }
-            else if(footer != null)
-            {
-                columnCount = footer.Count();
-            }
-            else if(values.Count() > 0)
-            {
-                columnCount = values.First().Count();
-            }
-            else
-            {
-                return new List<Row>();
-            }
-            if(header != null && header.Count() != columnCount || footer != null && footer.Count() != columnCount)
-            {
-                throw new ArgumentException("All column counts must be equal.");
-            }
-            return FormatRows(header, values, footer, alignments, columnCount);
-        }
-
-        /// <summary>
-        /// Format some objects into a table.
-        /// </summary>
-        /// <param name="header">
-        /// The heading of the table.
-        /// </param>
-        /// <param name="values">
-        /// The sequence of values in teh table.
-        /// </param>
-        /// <param name="footer">
-        /// The footer of the table.
-        /// </param>
-        /// <param name="alignments">
-        /// The alignments in the table.
-        /// </param>
-        /// <param name="columnCount">
-        /// The number of columns.
-        /// </param>
-        /// <exception cref="ArgumentException">
-        /// Thrown if the number
-        /// of columns does not match the number of <paramref name="alignments"/>.
-        /// </exception>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown if <paramref name="values"/> is <see langword="null" />.
-        /// </exception>
-        protected IEnumerable<Row> FormatRows(IEnumerable<object> header, IEnumerable<IEnumerable<object>> values, IEnumerable<object> footer, IEnumerable<Alignment> alignments, int columnCount)
-        {
-            if(values == null)
-                throw new ArgumentNullException("values");
-            if(values.Count() > 0 && values.First().Count() > alignments.Count())
-                throw new ArgumentException("The number of alignments must be at least as large as the number of columns.");
-            IList<Row> rows = new List<Row>();
-            IEnumerable<Row> bodyRows = base.FormatRows(values, alignments, columnCount);
-            if(TopBorder != '\0')
-            {
-                rows.Add(RowSeparatorFactory.MakeInstance(TopBorder, columnCount));
-            }
-            if(header != null)
-            {
-                rows.Add(RowFactory.MakeInstance(header));
-            }
-            else if(base.TopBorder != '\0')
-            {
-                bodyRows = bodyRows.Skip(1);
-            }
-            rows.AddRange(bodyRows);
-            if(footer != null)
-            {
-                rows.Add(RowFactory.MakeInstance(footer));
-            }
-            else if(base.BottomBorder != '\0')
-            {
-                rows.RemoveAt(rows.Count - 1);
-            }
-            if(BottomBorder != '\0')
-            {
-                rows.Add(RowSeparatorFactory.MakeInstance(BottomBorder, columnCount));
-            }
-            return rows;
-        }
-        
         #endregion
     }
 }

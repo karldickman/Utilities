@@ -35,13 +35,11 @@
       <Package>mono-nunit</Package>
     </Reference>
     <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="TestCells.cs" />
     <Compile Include="TestLabeledTableFormatter.cs" />
-    <Compile Include="TestRowFactory.cs" />
     <Compile Include="TestTableFormatter.cs" />
-    <Compile Include="TestTable.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

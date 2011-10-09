@@ -34,20 +34,15 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Cell.cs" />
-    <Compile Include="HorizontalCellSeparator.cs" />
-    <Compile Include="ICell.cs" />
     <Compile Include="LabeledTableFormatter.cs" />
     <Compile Include="PrettyTableFormatter.cs" />
-    <Compile Include="Row.cs" />
-    <Compile Include="RowFactory.cs" />
-    <Compile Include="Table.cs" />
     <Compile Include="TableFormatter.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

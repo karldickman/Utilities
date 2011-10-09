@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Ngol.Utilities.Collections.Extensions;
 using NUnit.Framework;
 
 namespace Ngol.Utilities.NUnit
@@ -11,6 +12,29 @@ namespace Ngol.Utilities.NUnit
     /// </summary>
     public static class MoreAssert
     {
+        /// <summary>
+        /// Verify that two iterables contain the same sequence of values.
+        /// </summary>
+        /// <param name="expected">
+        /// The expected iterable.
+        /// </param>
+        /// <param name="actual">
+        /// The actual iterable.
+        /// </param>
+        /// <typeparam name='T'>
+        /// The type of values in the collections.
+        /// </typeparam>
+        /// <exception cref="AssertionException">
+        /// Thrown if the assertion failed.
+        /// </exception>
+        public static void CollectionsEqual<T>(IEnumerable<T> expected, IEnumerable<T> actual)
+        {
+            Assert.IsNotNull(actual);
+            Assert.IsNotNull(expected);
+            MoreAssert.HaveSameCount(expected, actual);
+            expected.ForEach(actual, Assert.AreEqual);
+        }
+
         /// <summary>
         /// Verify that a value appears in a collection.
         /// </summary>
@@ -78,7 +102,15 @@ namespace Ngol.Utilities.NUnit
         /// </exception>
         public static void HasCount(int expected, IEnumerable collection)
         {
-            Assert.AreEqual(expected, collection.Cast<object>().Count());
+            if(collection == null)
+            {
+                Assert.Fail("  Expected: Count = {0}\n  But was: a null collection", expected);
+            }
+            int actual = collection.Cast<object>().Count();
+            if(expected != actual)
+            {
+                Assert.Fail("  Expected: Count = {0}\n  But was: Count = {1}", expected, actual);
+            }
         }
 
         /// <summary>
@@ -95,7 +127,59 @@ namespace Ngol.Utilities.NUnit
         /// </exception>
         public static void HasCount<T>(int expected, IEnumerable<T> collection)
         {
-            Assert.AreEqual(expected, collection.Count());
+            if(collection == null)
+            {
+                Assert.Fail("  Expected: Count = {0}\n  But was: a null collection", expected);
+            }
+            int actual = collection.Count();
+            if(expected != actual)
+            {
+                Assert.Fail("  Expected: Count = {0}\n  But was: Count = {1}", expected, actual);
+            }
+        }
+
+        /// <summary>
+        /// Verify that a string has the specified number of characters.
+        /// </summary>
+        /// <param name="expected">
+        /// The expected length of the string.
+        /// </param>
+        /// <param name="actual">
+        /// The string to test.
+        /// </param>
+        /// <exception cref="AssertionException">
+        /// Thrown if the assertion failed.
+        /// </exception>
+        public static void HasLength(int expected, string actual)
+        {
+            if(actual == null)
+            {
+                Assert.Fail("  Expected: string with length {0}\n  But was: a null string", expected);
+            }
+            if(expected != actual.Length)
+            {
+                Assert.Fail("  Expected: string with length {0}\n  But was: string with length {1}", expected, actual.Length);
+            }
+        }
+
+        /// <summary>
+        /// Check that two sequences are the same length.
+        /// </summary>
+        /// <param name="expected">
+        /// The sequence whose length is expected to be the same
+        /// as that of the <paramref name="actual" /> sequence.
+        /// </param>
+        /// <param name="actual">
+        /// The sequence whose length to check.
+        /// </param>
+        /// <exception cref="AssertionException">
+        /// Thrown if the assertion failed.
+        /// </exception>
+        public static void HaveSameCount<T1, T2>(IEnumerable<T1> expected, IEnumerable<T2> actual)
+        {
+            Assert.IsNotNull(expected);
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(expected.Count(), actual.Count());
         }
 
         /// <summary>
@@ -109,7 +193,14 @@ namespace Ngol.Utilities.NUnit
         /// </exception>
         public static void IsEmpty(IEnumerable collection)
         {
-            HasCount(0, collection);
+            if(collection == null)
+            {
+                Assert.Fail("  Expected: empty collection\n  But was: null collection");
+            }
+            if(0 != collection.Cast<object>().Count())
+            {
+                Assert.Fail("  Expected: empty collection\n  But was: non-empty collection");
+            }
         }
 
         /// <summary>
@@ -123,7 +214,14 @@ namespace Ngol.Utilities.NUnit
         /// </exception>
         public static void IsEmpty<T>(IEnumerable<T> collection)
         {
-            HasCount(0, collection);
+            if(collection == null)
+            {
+                Assert.Fail("  Expected: empty collection\n  But was: null collection");
+            }
+            if(0 != collection.Count())
+            {
+                Assert.Fail("  Expected: empty collection\n  But was: non-empty collection");
+            }
         }
 
         /// <summary>

@@ -81,9 +81,9 @@ namespace Ngol.Utilities.Collections.Extensions
                 throw new ArgumentNullException("array");
             if(array.GetLowerBound(0) != 0)
                 throw new ArgumentException("Array must be zero-indexed.");
-            if(arrayIndex <= 0)
+            if(arrayIndex < 0)
                 throw new ArgumentException("Array index must be at least zero.");
-            if(iterable.Count() + arrayIndex >= array.Length)
+            if(iterable.Count() + arrayIndex > array.Length)
                 throw new ArgumentException("There is not enough space in the array to perform the copy operation.");
             ForEachIndexed(iterable, arrayIndex, (value, index) =>
                 {
@@ -555,7 +555,9 @@ namespace Ngol.Utilities.Collections.Extensions
         public static bool IsEmpty<T>(this IEnumerable<T> iterable)
         {
             if(iterable == null)
+            {
                 throw new ArgumentNullException("iterable");
+            }
 #pragma warning disable 0219
             foreach(T value in iterable)
             {
@@ -563,6 +565,41 @@ namespace Ngol.Utilities.Collections.Extensions
             }
 #pragma warning restore 0219
             return true;
+        }
+
+        /// <summary>
+        /// Invoke a transformation function on each element of a <paramref name="sequence"/>
+        /// and return the maximum <see cref="uint" /> from that transformation.
+        /// </summary>
+        /// <param name="sequence">
+        /// A sequence of values whose maximum transformation is to be
+        /// determined.
+        /// </param>
+        /// <param name="selector">
+        /// A transformation function to apply to each element of the <paramref name="sequence"/>.
+        /// </param>
+        /// <returns>
+        /// The maximum value in the transformed sequence, or if the original <paramref name="sequence"/>
+        /// was empty, 0.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="sequence"/> or <paramref name="selector"/> is <see langword="null" /> .
+        /// </exception>
+        public static uint MaxOrIdentity<T>(this IEnumerable<T> sequence, Func<T, uint> selector)
+        {
+            if(sequence == null)
+            {
+                throw new ArgumentNullException("sequence");
+            }
+            if(selector == null)
+            {
+                throw new ArgumentNullException("selector");
+            }
+            if(sequence.Count() == 0)
+            {
+                return 0;
+            }
+            return Enumerable.Max(sequence, selector);
         }
 
         /// <summary>
@@ -615,33 +652,6 @@ namespace Ngol.Utilities.Collections.Extensions
         /// A transform function to apply to each source element; the second parameter of the function represents the index
         /// of the source element.
         /// </param>
-        /// <returns>
-        /// An IEnumerable&lt;<typeparamref name="TResult" /> whose elements are the result of invoking the transform function
-        /// on each element of <paramref name="source"/>.
-        /// </returns>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown if <paramref name="source"/> or <paramref name="selector"/> is <see langword="null" />.
-        /// </exception>
-        public static IEnumerable<TResult> Select<TSource, TResult>(this IEnumerable<TSource> source, Func<TSource, int, TResult> selector)
-        {
-            if(source == null)
-                throw new ArgumentNullException("iterable");
-            if(selector == null)
-                throw new ArgumentNullException("selector");
-            return source.Select(0, selector);
-        }
-
-        /// <summary>
-        /// Projects each element of a seqquence into a new form by incorporating the element's index
-        /// within the sequence.
-        /// </summary>
-        /// <param name="source">
-        /// A sequence of values on which to invoke a transform function.
-        /// </param>
-        /// <param name="selector">
-        /// A transform function to apply to each source element; the second parameter of the function represents the index
-        /// of the source element.
-        /// </param>
         /// <param name="startIndex">
         /// The value at which to initialize the indexes that are passed to the <paramref name="selector"/>.
         /// </param>
@@ -655,10 +665,14 @@ namespace Ngol.Utilities.Collections.Extensions
         public static IEnumerable<TResult> Select<TSource, TResult>(this IEnumerable<TSource> source, int startIndex, Func<TSource, int, TResult> selector)
         {
             if(source == null)
+            {
                 throw new ArgumentNullException("iterable");
+            }
             if(selector == null)
+            {
                 throw new ArgumentNullException("selector");
-            return source.Enumerate(startIndex).Select(entry => selector(entry.Value, entry.Index));
+            }
+            return source.Select((entry, index) => selector(entry, index + startIndex));
         }
 
         /// <summary>

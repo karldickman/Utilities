@@ -1,7 +1,9 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
+using Ngol.Utilities.Collections.Extensions;
+using Ngol.Utilities.System.Extensions;
 
 namespace Ngol.Utilities.TextFormat.Table
 {
@@ -16,38 +18,110 @@ namespace Ngol.Utilities.TextFormat.Table
         /// <summary>
         /// The bottom border of the table.
         /// </summary>
-        protected char BottomBorder
+        public string BottomBorder
         {
-            get;
-            set;
+            get { return BorderCharToString(BottomBorderChar); }
         }
 
         /// <summary>
-        /// The factory used to produce the rows.
+        /// The character used to separate columns.
         /// </summary>
-        protected RowFactory RowFactory
+        public string ColumnSeparator
         {
-            get;
-            set;
+            get { return BorderCharToString(ColumnSeparatorChar); }
         }
 
         /// <summary>
-        /// The factory used to produce the row separators.
+        /// The character used at the corner of cells.
         /// </summary>
-        protected RowFactory RowSeparatorFactory
+        public string Corner
         {
-            get;
-            set;
+            get { return BorderCharToString(CornerChar); }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether this instance has bottom border.
+        /// </summary>
+        /// <value>
+        /// <see langword="true" /> if this instance has bottom border; otherwise, <see langword="false" />.
+        /// </value>
+        public bool HasBottomBorder
+        {
+            get { return BottomBorderChar != '\0'; }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether this instance has column separator.
+        /// </summary>
+        /// <value>
+        /// <see langword="true" /> if this instance has column separator; otherwise, <see langword="false" />.
+        /// </value>
+        public bool HasColumnSeparator
+        {
+            get { return ColumnSeparatorChar != '\0'; }
+        }
+
+        /// <summary>
+        /// Does this table have a top border?
+        /// </summary>
+        public bool HasTopBorder
+        {
+            get { return TopBorderChar != '\0'; }
+        }
+
+        /// <summary>
+        /// The character used on the left border of the table.
+        /// </summary>
+        public string LeftBorder
+        {
+            get { return BorderCharToString(LeftBorderChar); }
+        }
+
+        /// <summary>
+        /// The character used on the right border of the table.
+        /// </summary>
+        public string RightBorder
+        {
+            get { return BorderCharToString(RightBorderChar); }
         }
 
         /// <summary>
         /// The top border of the table.
         /// </summary>
-        protected char TopBorder
+        public string TopBorder
         {
-            get;
-            set;
+            get { return BorderCharToString(TopBorderChar); }
         }
+
+        /// <summary>
+        /// The bottom border of the table.
+        /// </summary>
+        protected readonly char BottomBorderChar;
+
+        /// <summary>
+        /// The character used to separate columns.
+        /// </summary>
+        protected readonly char ColumnSeparatorChar;
+
+        /// <summary>
+        /// The character used at corners of cells.
+        /// </summary>
+        protected readonly char CornerChar;
+
+        /// <summary>
+        /// The character used on the left border of the table.
+        /// </summary>
+        protected readonly char LeftBorderChar;
+
+        /// <summary>
+        /// The character used on the right border of the table.
+        /// </summary>
+        protected readonly char RightBorderChar;
+
+        /// <summary>
+        /// The top border of the table.
+        /// </summary>
+        protected readonly char TopBorderChar;
 
         #endregion
 
@@ -148,25 +222,15 @@ namespace Ngol.Utilities.TextFormat.Table
         /// </param>
         public TableFormatter(char leftBorder, char columnSeparator, char rightBorder, char topBorder, char bottomBorder, char corner)
         {
-            TopBorder = topBorder;
-            BottomBorder = bottomBorder;
-            RowFactory = new RowFactory(leftBorder, columnSeparator, rightBorder);
-            char sepLeftBorder = corner;
-            char sepColumnSeparator = corner;
-            char sepRightBorder = corner;
-            if(leftBorder == '\0')
+            TopBorderChar = topBorder;
+            BottomBorderChar = bottomBorder;
+            LeftBorderChar = leftBorder;
+            ColumnSeparatorChar = columnSeparator;
+            RightBorderChar = rightBorder;
+            if(HasColumnSeparator)
             {
-                sepLeftBorder = '\0';
+                CornerChar = corner;
             }
-            if(columnSeparator == '\0')
-            {
-                sepColumnSeparator = '\0';
-            }
-            if(rightBorder == '\0')
-            {
-                sepRightBorder = '\0';
-            }
-            RowSeparatorFactory = new RowFactory(sepLeftBorder, sepColumnSeparator, sepRightBorder);
         }
 
         #endregion
@@ -176,119 +240,212 @@ namespace Ngol.Utilities.TextFormat.Table
         /// <summary>
         /// Format a list of objects into a table.
         /// </summary>
-        /// <param name="values">
+        /// <param name="table">
         /// A sequence of values to be formatted into a table.
         /// </param>
         /// <exception cref="ArgumentNullException">
-        /// Thrown if <paramref name="values"/> is <see langword="null" />.
+        /// Thrown if <paramref name="table"/> is <see langword="null" />.
         /// </exception>
-        public Table Format(IEnumerable<IEnumerable<object>> values)
+        public IEnumerable<string> Format(DataTable table)
         {
-            if(values == null)
-                throw new ArgumentNullException("values");
-            return Format(values, null);
+            if(table == null)
+            {
+                throw new ArgumentNullException("table");
+            }
+            return Format(table, StringFormatting.LeftPadded);
+        }
+
+        /// <summary>
+        /// Format a list of objects into a table.
+        /// </summary>
+        /// <param name="table">
+        /// A sequence of values to be formatted into a table.
+        /// </param>
+        /// <param name="alignment">
+        /// The function to apply to the cells in the table.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="table"/> or <paramref name="alignment"/> is <see langword="null" />.
+        /// </exception>
+        public IEnumerable<string> Format(DataTable table, Func<object, int, string> alignment)
+        {
+            if(table == null)
+            {
+                throw new ArgumentNullException("table");
+            }
+            if(alignment == null)
+            {
+                throw new ArgumentNullException("alignment");
+            }
+            return Format(table, Enumerable.Repeat(alignment, table.Columns.Count));
         }
 
         /// <summary>
         /// Format a list of objects into a table, using a special alignment for
         /// each column.
         /// </summary>
-        /// <param name="values">
+        /// <param name="table">
         /// A sequence of values to be formatted into a table.
         /// </param>
         /// <param name="alignments">
         /// The alignments for each column.
         /// </param>
         /// <exception cref="ArgumentNullException">
-        /// Thrown if <paramref name="values"/> is <see langword="null" />.
+        /// Thrown if <paramref name="table"/> or <paramref name="alignments"/> (or any member thereof) is <see langword="null" />.
         /// </exception>
         /// <exception cref="ArgumentException">
         /// Thrown if the number
         /// of columns does not match the number of <paramref name="alignments"/>.
         /// </exception>
-        public Table Format(IEnumerable<IEnumerable<object>> values, IEnumerable<Alignment> alignments)
+        public IEnumerable<string> Format(DataTable table, IEnumerable<Func<object, int, string>> alignments)
         {
-            if(values == null)
-                throw new ArgumentNullException("values");
-            if(values.Count() > 0 && values.First().Count() > alignments.Count())
+            if(table == null)
+            {
+                throw new ArgumentNullException("table");
+            }
+            if(alignments == null)
+            {
+                throw new ArgumentNullException("alignments");
+            }
+            if(alignments.Contains(null))
+            {
+                throw new ArgumentNullException("alignments");
+            }
+            int columnCount = table.Columns.Count;
+            if(columnCount > alignments.Count())
+            {
                 throw new ArgumentException("The number of alignments must be at least as large as the number of columns.");
-            IEnumerable<Row> rows = FormatRows(values, alignments);
-            return new Table(rows);
+            }
+            IEnumerable<DataRow > rows = table.Rows.Cast<DataRow>().ToList();
+            IEnumerable<int > columnWidths = GetColumnWidths(table).ToList();
+            if(HasTopBorder)
+            {
+                yield return GetRowSeparator(TopBorderChar, columnWidths);
+            }
+            foreach(DataRow row in rows)
+            {
+                yield return FormatRow(row, alignments, columnWidths);
+            }
+            if(HasBottomBorder)
+            {
+                yield return GetRowSeparator(BottomBorderChar, columnWidths);
+            }
         }
 
         /// <summary>
-        /// Format a list of objects into a table, using a special alignment for
-        /// each column.
+        /// Formats a row.
         /// </summary>
-        /// <param name="values">
-        /// A sequence of values to be formatted into a table.
+        /// <param name="row">
+        /// The row to format.
         /// </param>
-        /// <param name="alignments">
-        /// The alignments for each column.
+        /// <param name="columnWidths">
+        /// The widths of the columns to format the row.
         /// </param>
-        /// <exception cref="ArgumentException">
-        /// Thrown when the number of columns is unequal.
-        /// </exception>
         /// <exception cref="ArgumentNullException">
-        /// Thrown if <paramref name="values"/> is <see langword="null" />.
+        /// Thrown if <paramref name="row"/> or <paramref name="columnWidths"/>
+        /// is <see langword="null" />.
         /// </exception>
-        /// <exception cref="ArgumentException">
-        /// Thrown if the number
-        /// of columns does not match the number of <paramref name="alignments"/>.
-        /// </exception>
-        protected IEnumerable<Row> FormatRows(IEnumerable<IEnumerable<object>> values, IEnumerable<Alignment> alignments)
+        protected string FormatRow(IEnumerable<string> row, IEnumerable<int> columnWidths)
         {
-            if(values == null)
-                throw new ArgumentNullException("values");
-            if(values.Count() > 0 && values.First().Count() > alignments.Count())
-                throw new ArgumentException("The number of alignments must be at least as large as the number of columns.");
-            if(values.Count() == 0)
-                return Enumerable.Empty<Row>();
-            IEnumerable<int> columnCounts = values.Select(row => row.Count()).Distinct();
-            if(columnCounts.Count() != 1)
-                throw new ArgumentException("Every row must have exactly the same number of cells.");
-            int columnCount = columnCounts.Single();
-            return FormatRows(values, alignments, columnCount);
+            if(row == null)
+            {
+                throw new ArgumentNullException("row");
+            }
+            if(columnWidths == null)
+            {
+                throw new ArgumentNullException("columnWidths");
+            }
+            return string.Format("{0}{1}{2}", LeftBorder, ColumnSeparator.Join(row), RightBorder);
         }
 
         /// <summary>
-        /// Format a list of objects into a table, using a special alignment for
-        /// each column.
+        /// Formats a <see cref="DataRow" />.
         /// </summary>
-        /// <param name="values">
-        /// A sequence of values to be formatted into a table.
+        /// <param name="row">
+        /// The <see cref="DataRow" /> to format.
         /// </param>
         /// <param name="alignments">
         /// The alignments for each column.
         /// </param>
-        /// <param name="columnCount">
-        /// The number of columns in the table.
+        /// <param name="columnWidths">
+        /// The widths of the columns to format the row.
         /// </param>
         /// <exception cref="ArgumentNullException">
-        /// Thrown if <paramref name="values"/> is <see langword="null" />.
+        /// Thrown if <paramref name="row"/> (or <see cref="DataRow.ItemArray" /> thereon), <paramref name="alignments"/> (or any member thereof),
+        /// or <paramref name="columnWidths"/>
+        /// is <see langword="null" />.
         /// </exception>
-        /// <exception cref="ArgumentException">
-        /// Thrown if the number
-        /// of columns does not match the number of <paramref name="alignments"/>.
-        /// </exception>
-        protected IEnumerable<Row> FormatRows(IEnumerable<IEnumerable<object>> values, IEnumerable<Alignment> alignments, int columnCount)
+        protected string FormatRow(DataRow row, IEnumerable<Func<object, int, string>> alignments, IEnumerable<int> columnWidths)
         {
-            if(values == null)
-                throw new ArgumentNullException("values");
-            if(values.Count() > 0 && values.First().Count() > alignments.Count())
-                throw new ArgumentException("The number of alignments must be at least as large as the number of columns.");
-            if(TopBorder != '\0')
+            if(row == null)
             {
-                yield return RowSeparatorFactory.MakeInstance(TopBorder, columnCount);
+                throw new ArgumentNullException("row");
             }
-            foreach(IEnumerable<object> valueRow in values)
+            if(row.ItemArray == null)
             {
-                yield return RowFactory.MakeInstance(valueRow, alignments);
+                throw new ArgumentNullException("row");
             }
-            if(BottomBorder != '\0')
+            if(alignments == null)
             {
-                yield return RowSeparatorFactory.MakeInstance(BottomBorder, columnCount);
+                throw new ArgumentNullException("alignments");
             }
+            if(alignments.Contains(null))
+            {
+                throw new ArgumentNullException("alignments");
+            }
+            if(columnWidths == null)
+            {
+                throw new ArgumentNullException("columnWidths");
+            }
+            IEnumerable<string > cells = row.ItemArray.EquiZip(alignments, columnWidths, (value, align, width) => align(value, width));
+            return FormatRow(cells, columnWidths);
+        }
+
+        /// <summary>
+        /// Find the widths in characters for all the columns
+        /// in the given <see cref="DataTable" />.
+        /// </summary>
+        /// <param name="table">
+        /// The <see cref="DataTable" /> whose column widths to find.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="table"/> is <see langword="null" /> .
+        /// </exception>
+        protected IEnumerable<int> GetColumnWidths(DataTable table)
+        {
+            if(table == null)
+            {
+                throw new ArgumentNullException("table");
+            }
+            IEnumerable<DataColumn > columns = table.Columns.Cast<DataColumn>().ToList();
+            IEnumerable<DataRow > rows = table.Rows.Cast<DataRow>().ToList();
+            Func<DataRow, int, uint > rowLengthAt = (row, columnIndex) => {
+                return (uint)row.ItemArray[columnIndex].ToString().Length;
+            };
+            return columns.Select((column, columnIndex) => (int)rows.MaxOrIdentity(row => rowLengthAt(row, columnIndex)));
+        }
+
+        /// <summary>
+        /// Generate a separator to insert between rows.
+        /// </summary>
+        /// <param name="separator">
+        /// A <see cref="char" /> to use in the separator.
+        /// </param>
+        /// <param name="columnWidths">
+        /// The widths, in characters, of the columns in the table.
+        /// </param>
+        protected string GetRowSeparator(char separator, IEnumerable<int> columnWidths)
+        {
+            string text = Corner.Join(columnWidths.Select(width => new string(separator, width)));
+            return Corner + text + Corner;
+        }
+
+        /// <summary>
+        /// Convert a <see cref="char" /> used for a table border into a more useable <see cref="string" />.
+        /// </summary>
+        protected static string BorderCharToString(char borderChar)
+        {
+            return borderChar == '\0' ? string.Empty : borderChar.ToString();
         }
 
         #endregion

@@ -1,12 +1,7 @@
 using System;
 
 namespace Ngol.Utilities.TextFormat
-{
-    /// <summary>
-    /// A function that aligns a string, and forces it to a specified width.
-    /// </summary>
-    public delegate string Alignment(object toAlign, int width);
-    
+{    
     /// <summary>
     /// Some useful functions for formatting strings.
     /// </summary>
