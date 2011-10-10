@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Ngol.Utilities.Collections.Extensions
 {
@@ -30,13 +31,43 @@ namespace Ngol.Utilities.Collections.Extensions
         public static void AddRange<T>(this ICollection<T> collection, IEnumerable<T> values)
         {
             if(collection == null)
+            {
                 throw new ArgumentNullException("collection");
+            }
             if(values == null)
+            {
                 throw new ArgumentNullException("values");
+            }
             foreach(T value in values)
             {
                 collection.Add(value);
             }
+        }
+
+        /// <summary>
+        /// Remove all properties from a <paramref name="collection"/> for which the specified
+        /// <paramref name="predicate"/> is true.
+        /// </summary>
+        /// <param name="collection">
+        /// The collection from which to remove items.
+        /// </param>
+        /// <param name="predicate">
+        /// The predicate to use to test whether items should be removed.
+        /// </param>
+        /// <typeparam name="T">
+        /// The type of the items in the <paramref name="collection"/>.
+        /// </typeparam>
+        public static bool Remove<T>(this ICollection<T> collection, Func<T, bool> predicate)
+        {
+            bool found = false;
+            for(T match = collection.SingleOrDefault(predicate);
+                match != null && !match.Equals(default(T));
+                match = collection.SingleOrDefault(predicate))
+            {
+                collection.Remove(match);
+                found = true;
+            }
+            return found;
         }
     }
 }
