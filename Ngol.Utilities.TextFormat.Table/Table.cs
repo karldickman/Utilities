@@ -37,6 +37,16 @@ namespace Ngol.Utilities.TextFormat.Table
         public readonly RowCollection Rows;
 
         /// <summary>
+        /// The title of this <see cref="Table" />.
+        /// </summary>
+        public string Title
+        {
+            get { return InnerTable.TableName; }
+
+            set { InnerTable.TableName = value; }
+        }
+
+        /// <summary>
         /// The <see cref="DataTable" /> to which most calls are delegated.
         /// </summary>
         protected readonly DataTable InnerTable;
