@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 
 namespace Ngol.Utilities.TextFormat.Table
@@ -14,30 +13,30 @@ namespace Ngol.Utilities.TextFormat.Table
         #region Properties
 
         /// <summary>
-        /// The <see cref="DataRow" /> to which most method calls are delegated.
+        /// The values in this <see cref="Row" />.
         /// </summary>
-        protected readonly DataRow InnerRow;
+        protected readonly object[] Values;
 
         #endregion
 
         #region Constructors
 
         /// <summary>
-        /// Construct a new <see cref="Row" />.
+        /// Construct a new <see cref="Row"/>.
         /// </summary>
-        /// <param name="row">
-        /// The <see cref="DataRow" /> to which to delegate.
+        /// <param name="values">
+        /// The values to put in the <see cref="Row" />.
         /// </param>
         /// <exception cref="ArgumentNullException">
-        /// Thrown if <paramref name="row"/> is <see langword="null" />.
+        /// Thrown if <paramref name="values"/> is <see langword="null" />.
         /// </exception>
-        protected internal Row(DataRow row)
+        protected internal Row(IEnumerable<object> values)
         {
-            if(row == null)
+            if(values == null)
             {
-                throw new ArgumentNullException("row");
+                throw new ArgumentNullException("values");
             }
-            InnerRow = row;
+            Values = values.ToArray();
         }
 
         #endregion
@@ -52,9 +51,19 @@ namespace Ngol.Utilities.TextFormat.Table
         /// </param>
         public object this[int columnIndex]
         {
-            get { return InnerRow.ItemArray[columnIndex]; }
+            get
+            {
+                try
+                {
+                    return Values[columnIndex];
+                }
+                catch(Exception e)
+                {
+                    throw e;
+                }
+            }
 
-            set { InnerRow.ItemArray[columnIndex] = value; }
+            set { Values[columnIndex] = value; }
         }
         
         #endregion
@@ -64,7 +73,7 @@ namespace Ngol.Utilities.TextFormat.Table
         /// <inheritdoc />
         public IEnumerator<object> GetEnumerator()
         {
-            return InnerRow.ItemArray.Cast<object>().GetEnumerator();
+            return Values.Cast<object>().GetEnumerator();
         }
 
         #region IEnumerable implementation

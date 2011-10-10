@@ -1,5 +1,4 @@
 using System;
-using System.Data;
 
 namespace Ngol.Utilities.TextFormat.Table
 {
@@ -11,7 +10,12 @@ namespace Ngol.Utilities.TextFormat.Table
         #region Properties
 
         /// <summary>
-        /// The method used to format the contens of the column.
+        /// The <see cref="Type" /> of this <see cref="Column" />.
+        /// </summary>
+        public Type DataType { get; set; }
+
+        /// <summary>
+        /// The method used to format the contens of the <see cref="Column" />.
         /// </summary>
         public Alignment Format
         {
@@ -19,13 +23,9 @@ namespace Ngol.Utilities.TextFormat.Table
         }
 
         /// <summary>
-        /// The name of this column.
+        /// The name of this <see cref="Column" />.
         /// </summary>
-        public string Name
-        {
-            get { return InnerColumn.ColumnName; }
-            set { InnerColumn.ColumnName = value; }
-        }
+        public string Name { get; set; }
 
         /// <summary>
         /// The method used to align the contents of the column.
@@ -37,11 +37,6 @@ namespace Ngol.Utilities.TextFormat.Table
         /// </summary>
         protected internal Format InnerFormat { get; set; }
 
-        /// <summary>
-        /// The <see cref="DataColumn" /> to which many method calls are delegated.
-        /// </summary>
-        protected readonly DataColumn InnerColumn;
-
         #endregion
 
         #region Constructors
@@ -49,8 +44,11 @@ namespace Ngol.Utilities.TextFormat.Table
         /// <summary>
         /// Construct a new <see cref="Column" />.
         /// </summary>
-        /// <param name="innerColumn">
-        /// The <see cref="DataColumn" /> to which to delegate.
+        /// <param name="name">
+        /// The name of this <see cref="Column" />
+        /// </param>
+        /// <param name="dataType">
+        /// The <see cref="Type" /> of this <see cref="Column" />
         /// </param>
         /// <param name="alignment">
         /// The <see cref="Alignment" /> to apply to this column.
@@ -60,11 +58,15 @@ namespace Ngol.Utilities.TextFormat.Table
         /// <exception cref="ArgumentNullException">
         /// Thrown if any argument is <see langword="null" />.
         /// </exception>
-        protected internal Column(DataColumn innerColumn, Format format, Alignment alignment)
+        protected internal Column(string name, Type dataType, Format format, Alignment alignment)
         {
-            if(innerColumn == null)
+            if(name == null)
             {
-                throw new ArgumentNullException("innerColumn");
+                throw new ArgumentNullException("name");
+            }
+            if(dataType == null)
+            {
+                throw new ArgumentNullException("dataType");
             }
             if(alignment == null)
             {
@@ -74,9 +76,10 @@ namespace Ngol.Utilities.TextFormat.Table
             {
                 throw new ArgumentNullException("format");
             }
+            Name = name;
+            DataType = dataType;
             Alignment = alignment;
             InnerFormat = format;
-            InnerColumn = innerColumn;
         }
 
         #endregion

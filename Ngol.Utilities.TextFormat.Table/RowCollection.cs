@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections;
-using System.Data;
+using System.Linq;
 
 namespace Ngol.Utilities.TextFormat.Table
 {
@@ -13,13 +13,22 @@ namespace Ngol.Utilities.TextFormat.Table
         #region Properties
 
         /// <summary>
-        /// The <see cref="DataRowCollection" /> to which many method calls delegate.
+        /// The number of <see cref="Column" />s in the owning table.
         /// </summary>
-        protected readonly DataRowCollection InnerCollection;
+        protected int ColumnCount
+        {
+            get { return Table.ColumnCount; }
+        }
+
         /// <summary>
         /// The <see cref="Row" />s in this collection.
         /// </summary>
         protected readonly ICollection<Row> Rows;
+
+        /// <summary>
+        /// The <see cref="Table" /> that owns this <see cref="RowCollection" />.
+        /// </summary>
+        protected readonly Table Table;
 
         #endregion
 
@@ -28,20 +37,17 @@ namespace Ngol.Utilities.TextFormat.Table
         /// <summary>
         /// Construct a new <see cref="RowCollection"/>.
         /// </summary>
-        /// <param name="innerCollection">
-        /// The <see cref="DataRowCollection" /> to which to delegate.
-        /// </param>
         /// <exception cref="ArgumentNullException">
-        /// Thrown if <paramref name="innerCollection"/> is <see langword="null" /> .
+        /// Thrown if <paramref name="table"/> is <see langword="null" />.
         /// </exception>
-        protected internal RowCollection(DataRowCollection innerCollection)
+        protected internal RowCollection(Table table)
         {
-            if(innerCollection == null)
+            if(table == null)
             {
-                throw new ArgumentNullException("innerCollection");
+                throw new ArgumentNullException("table");
             }
+            Table = table;
             Rows = new List<Row>();
-            InnerCollection = innerCollection;
         }
 
         #endregion
@@ -51,16 +57,33 @@ namespace Ngol.Utilities.TextFormat.Table
         /// <summary>
         /// Add a <see cref="Row" /> to this collection.
         /// </summary>
-        /// <param name="args">
+        /// <param name="values">
         /// The values in the <see cref="Row"/>.
         /// </param>
         /// <returns>
         /// The <see cref="Row" /> that was added.
         /// </returns>
-        public Row Add(params object[] args)
+        public Row Add(params object[] values)
         {
-            DataRow dataRow = InnerCollection.Add(args);
-            Row row = new Row(dataRow);
+            IEnumerable<object > rowValues;
+            if(values.Length > ColumnCount)
+            {
+                rowValues = values.Take(ColumnCount);
+            }
+            else if(values.Length < ColumnCount)
+            {
+                IList<object > list = values.ToList();
+                for(int i = 0; i < ColumnCount - values.Length; i++)
+                {
+                    list.Add(null);
+                }
+                rowValues = list;
+            }
+            else
+            {
+                rowValues = values;
+            }
+            Row row = new Row(rowValues);
             Rows.Add(row);
             return row;
         }

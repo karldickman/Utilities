@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using Ngol.Utilities.Collections.Extensions;
 
@@ -12,6 +11,14 @@ namespace Ngol.Utilities.TextFormat.Table
     public class Table
     {
         #region Properties
+
+        /// <summary>
+        /// The number of <see cref="Columns" /> in this table.
+        /// </summary>
+        public int ColumnCount
+        {
+            get { return Columns.Count; }
+        }
 
         /// <summary>
         /// The collection of <see cref="Column" />s in the <see cref="Table" />.
@@ -39,17 +46,7 @@ namespace Ngol.Utilities.TextFormat.Table
         /// <summary>
         /// The title of this <see cref="Table" />.
         /// </summary>
-        public string Title
-        {
-            get { return InnerTable.TableName; }
-
-            set { InnerTable.TableName = value; }
-        }
-
-        /// <summary>
-        /// The <see cref="DataTable" /> to which most calls are delegated.
-        /// </summary>
-        protected readonly DataTable InnerTable;
+        public string Title { get; set; }
 
         #endregion
 
@@ -65,33 +62,15 @@ namespace Ngol.Utilities.TextFormat.Table
         /// The method to use to align the text in the table's header.
         /// Defaults to <see cref="StringFormatting.LeftJustified" />.
         /// </param>
-        public Table(string tableName=null, Alignment headerAlignment=null) : this(tableName == null ? new DataTable() : new DataTable(tableName))
+        public Table(string tableName=null, Alignment headerAlignment=null)
         {
             if(headerAlignment == null)
             {
                 headerAlignment = StringFormatting.LeftJustified;
             }
             HeaderAlignment = headerAlignment;
-        }
-
-        /// <summary>
-        /// Construct a new <see cref="Table" />.
-        /// </summary>
-        /// <param name="innerTable">
-        /// The <see cref="DataTable" /> to which to delegate.
-        /// </param>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown if <paramref name="innerTable"/> is <see langword="null" />.
-        /// </exception>
-        protected Table(DataTable innerTable)
-        {
-            if(innerTable == null)
-            {
-                throw new ArgumentNullException("innerTable");
-            }
-            InnerTable = innerTable;
-            Columns = new ColumnCollection(innerTable.Columns);
-            Rows = new RowCollection(innerTable.Rows);
+            Columns = new ColumnCollection();
+            Rows = new RowCollection(this);
         }
 
         #endregion
@@ -121,9 +100,16 @@ namespace Ngol.Utilities.TextFormat.Table
 
         private uint RowLengthAt(Row row, int columnIndex)
         {
-            Column column = Columns[columnIndex];
-            Format format = column.InnerFormat;
-            return Convert.ToUInt32(format(row[columnIndex]).Length);
+            try
+            {
+                Column column = Columns[columnIndex];
+                Format format = column.InnerFormat;
+                return Convert.ToUInt32(format(row[columnIndex]).Length);
+            }
+            catch(Exception e)
+            {
+                throw e;
+            }
         }
 
         #endregion

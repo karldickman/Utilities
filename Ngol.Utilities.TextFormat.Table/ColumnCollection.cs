@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Collections;
 using Ngol.Utilities.Collections.Extensions;
 
@@ -18,18 +17,13 @@ namespace Ngol.Utilities.TextFormat.Table
         /// </summary>
         public int Count
         {
-            get { return InnerCollection.Count; }
+            get { return Columns.Count; }
         }
 
         /// <summary>
         /// The <see cref="Column" />s in the collection.
         /// </summary>
         protected readonly IList<Column> Columns;
-
-        /// <summary>
-        /// The <see cref="DataColumnCollection" /> to which to delegate.
-        /// </summary>
-        protected DataColumnCollection InnerCollection;
 
         #endregion
 
@@ -38,20 +32,12 @@ namespace Ngol.Utilities.TextFormat.Table
         /// <summary>
         /// Construct a new <see cref="ColumnCollection"/>.
         /// </summary>
-        /// <param name="innerCollection">
-        /// The <see cref="DataColumnCollection" /> to which to delegate.
-        /// </param>
         /// <exception cref="ArgumentNullException">
         /// Thrown if <paramref name="innerCollection"/> is <see langword="null" /> .
         /// </exception>
-        protected internal ColumnCollection(DataColumnCollection innerCollection)
+        protected internal ColumnCollection()
         {
-            if(innerCollection == null)
-            {
-                throw new ArgumentNullException("innerCollection");
-            }
             Columns = new List<Column>();
-            InnerCollection = innerCollection;
         }
 
         #endregion
@@ -110,10 +96,7 @@ namespace Ngol.Utilities.TextFormat.Table
             {
                 alignment = StringFormatting.LeftJustified;
             }
-            DataColumn dataColumn = new DataColumn(columnName, dataType);
-            Column column = new Column(dataColumn, format, alignment);
-            InnerCollection.Add(columnName, dataType);
-            Columns.Add(column);
+            Columns.Add(new Column(columnName, dataType, format, alignment));
         }
 
         /// <summary>
@@ -129,7 +112,6 @@ namespace Ngol.Utilities.TextFormat.Table
         /// </returns>
         public bool Remove(string columnName)
         {
-            InnerCollection.Remove(columnName);
             return Columns.Remove(column => column.Name == columnName);
         }
 
@@ -141,7 +123,6 @@ namespace Ngol.Utilities.TextFormat.Table
         /// </param>
         public void RemoveAt(int index)
         {
-            InnerCollection.RemoveAt(index);
             Columns.RemoveAt(index);
         }
 
