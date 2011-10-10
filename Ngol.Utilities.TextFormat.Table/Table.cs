@@ -104,10 +104,10 @@ namespace Ngol.Utilities.TextFormat.Table
         /// </summary>
         public IEnumerable<int> GetColumnWidths(bool includeHeaders=false)
         {
-            IEnumerable<int > columnWidths = Columns.Select(MaxLengthInColumn);
+            IEnumerable<int > columnWidths = Columns.Select(MaxLengthInColumn).ToList();
             if(includeHeaders)
             {
-                IEnumerable<int > headerWidths = Headers.Select(header => header.ToString().Length);
+                IEnumerable<int > headerWidths = Headers.Select(header => header.ToString().Length).ToList();
                 return columnWidths.Zip(headerWidths, Math.Max);
             }
             return columnWidths;

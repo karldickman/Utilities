@@ -442,7 +442,7 @@ namespace Ngol.Utilities.TextFormat.Table
                     throw new ArgumentNullException("table");
                 }
                 Table = table;
-                ColumnWidths = Table.GetColumnWidths();
+                ColumnWidths = Table.GetColumnWidths().ToList();
                 TopBorderChar = topBorder;
                 BottomBorderChar = bottomBorder;
                 LeftBorderChar = leftBorder;
