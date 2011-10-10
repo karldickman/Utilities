@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Ngol.Utilities.NUnit;
+using Ngol.Utilities.Reflection.Extensions;
 using Ngol.Utilities.TextFormat.Table;
 using NUnit.Framework;
 
@@ -56,32 +57,9 @@ namespace Ngol.Utilities.TextFormat.Table.Tests
         #region Tests
 
         [Test]
-        public void TestFormatNoRowsOrColumns()
-        {
-            DataTable table = new DataTable();
-            MoreAssert.IsEmpty(Formatter.Format(table));
-            TableFormatter formatter = new TableFormatter('\0', '\0', '\0', '-', '\0', '+');
-            IEnumerable<string > actual = formatter.Format(table);
-            MoreAssert.HasCount(1, actual);
-            MoreAssert.HasLength(0, actual.First());
-            actual = FormatterT.Format(table);
-            MoreAssert.HasCount(1, actual);
-            MoreAssert.HasLength(2, actual.First());
-            actual = FormatterB.Format(table);
-            MoreAssert.HasCount(1, actual);
-            MoreAssert.HasCount(2, actual.First());
-            actual = FormatterTB.Format(table);
-            MoreAssert.HasCount(2, actual);
-            foreach(string line in actual)
-            {
-                MoreAssert.HasCount(2, line);
-            }
-        }
-
-        [Test]
         public void TestFormatNoColumns()
         {
-            DataTable table = new DataTable();
+            Table table = new Table();
             table.Rows.Add();
             table.Rows.Add();
             IEnumerable<string > actual = Formatter.Format(table);
@@ -95,26 +73,26 @@ namespace Ngol.Utilities.TextFormat.Table.Tests
         [Test]
         public void TestFormatNoRows()
         {
-            DataTable table = new DataTable();
+            Table table = new Table();
             table.Columns.Add("x");
             table.Columns.Add("y");
             IEnumerable<string > actual = Formatter.Format(table);
             MoreAssert.IsEmpty(actual);
             actual = FormatterT.Format(table);
             MoreAssert.HasCount(1, actual);
-            Assert.AreEqual("+++", actual.First());
+            Assert.AreEqual("+", actual.First());
             actual = FormatterTB.Format(table);
             MoreAssert.HasCount(2, actual);
             foreach(string line in actual)
             {
-                Assert.AreEqual("---", line);
+                Assert.AreEqual("-", line);
             }
         }
 
         [Test]
         public void TestFormat2x2()
         {
-            DataTable table = new DataTable();
+            Table table = new Table();
             table.Columns.Add("thing", typeof(int));
             table.Columns.Add("stuff", typeof(char));
             table.Rows.Add(1, 'a');
@@ -123,6 +101,24 @@ namespace Ngol.Utilities.TextFormat.Table.Tests
             IEnumerable<string > expected = new List<string> { "1 a", "2 b", "3 c", };
             IEnumerable<string > actual = Formatter.Format(table);
             MoreAssert.CollectionsEqual(expected, actual);
+        }
+
+        [Test]
+        public void TestGetRowSeparator()
+        {
+            Table table = new Table();
+            table.Columns.Add("thing", typeof(string));
+            table.Columns.Add("stuff", typeof(string));
+            table.Rows.Add("xx", "zzz");
+            table.Rows.Add("walrus", "thingything");
+            TableFormatter formatter = new TableFormatter('\0', '|', '\0', '\0', '\0', '+');
+            Assert.AreEqual("------+-----------", formatter.GetRowSeparator(table, '-'));
+            formatter = new TableFormatter('|', '|', '\0', '\0', '\0', '+');
+            Assert.AreEqual("+------+-----------", formatter.GetRowSeparator(table, '-'));
+            formatter = new TableFormatter('\0', '|', '|', '\0', '\0', '+');
+            Assert.AreEqual("------+-----------+", formatter.GetRowSeparator(table, '-'));
+            formatter = new TableFormatter('|', '|', '|', '\0', '\0', '+');
+            Assert.AreEqual("+------+-----------+", formatter.GetRowSeparator(table, '-'));
         }
 
         #endregion

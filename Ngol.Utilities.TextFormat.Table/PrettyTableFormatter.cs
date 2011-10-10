@@ -10,7 +10,7 @@ namespace Ngol.Utilities.TextFormat.Table
         /// <summary>
         /// Create a formatter that produces standard ASCII tables.
         /// </summary>
-        public PrettyTableFormatter () : base('|', '|', '|', '-', '-', '-', '-', '+')
+        public PrettyTableFormatter() : base('|', '|', '|', '-', '-', '-', '+')
         {
         }
     }

@@ -62,6 +62,28 @@ namespace Ngol.Utilities.TextFormat.Table
         }
 
         /// <summary>
+        /// Gets a value indicating whether this instance has left border.
+        /// </summary>
+        /// <value>
+        /// <see langword="true" /> if this instance has left border; otherwise, <see langword="false" />.
+        /// </value>
+        public bool HasLeftBorder
+        {
+            get { return LeftBorderChar != '\0'; }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether this instance has right border.
+        /// </summary>
+        /// <value>
+        /// <see langword="true" /> if this instance has right border; otherwise, <see langword="false" />.
+        /// </value>
+        public bool HasRightBorder
+        {
+            get { return RightBorderChar != '\0'; }
+        }
+
+        /// <summary>
         /// Does this table have a top border?
         /// </summary>
         public bool HasTopBorder
@@ -238,206 +260,42 @@ namespace Ngol.Utilities.TextFormat.Table
         #region Methods
 
         /// <summary>
-        /// Format a list of objects into a table.
+        /// Format a <see cref="Table" /> to be printed on the console.
         /// </summary>
         /// <param name="table">
-        /// A sequence of values to be formatted into a table.
+        /// The <see cref="Table" /> to format.
         /// </param>
         /// <exception cref="ArgumentNullException">
         /// Thrown if <paramref name="table"/> is <see langword="null" />.
         /// </exception>
-        public IEnumerable<string> Format(DataTable table)
+        public IEnumerable<string> Format(Table table)
         {
             if(table == null)
             {
                 throw new ArgumentNullException("table");
             }
-            return Format(table, StringFormatting.LeftPadded);
+            return GetFormatterFor(table).Format();
         }
 
         /// <summary>
-        /// Format a list of objects into a table.
+        /// Get a row separator for the specified <see cref="Table" />.
         /// </summary>
         /// <param name="table">
-        /// A sequence of values to be formatted into a table.
+        /// The <see cref="Table" /> for which to get the row separator.
         /// </param>
-        /// <param name="alignment">
-        /// The function to apply to the cells in the table.
-        /// </param>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown if <paramref name="table"/> or <paramref name="alignment"/> is <see langword="null" />.
-        /// </exception>
-        public IEnumerable<string> Format(DataTable table, Func<object, int, string> alignment)
-        {
-            if(table == null)
-            {
-                throw new ArgumentNullException("table");
-            }
-            if(alignment == null)
-            {
-                throw new ArgumentNullException("alignment");
-            }
-            return Format(table, Enumerable.Repeat(alignment, table.Columns.Count));
-        }
-
-        /// <summary>
-        /// Format a list of objects into a table, using a special alignment for
-        /// each column.
-        /// </summary>
-        /// <param name="table">
-        /// A sequence of values to be formatted into a table.
-        /// </param>
-        /// <param name="alignments">
-        /// The alignments for each column.
-        /// </param>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown if <paramref name="table"/> or <paramref name="alignments"/> (or any member thereof) is <see langword="null" />.
-        /// </exception>
-        /// <exception cref="ArgumentException">
-        /// Thrown if the number
-        /// of columns does not match the number of <paramref name="alignments"/>.
-        /// </exception>
-        public IEnumerable<string> Format(DataTable table, IEnumerable<Func<object, int, string>> alignments)
-        {
-            if(table == null)
-            {
-                throw new ArgumentNullException("table");
-            }
-            if(alignments == null)
-            {
-                throw new ArgumentNullException("alignments");
-            }
-            if(alignments.Contains(null))
-            {
-                throw new ArgumentNullException("alignments");
-            }
-            int columnCount = table.Columns.Count;
-            if(columnCount > alignments.Count())
-            {
-                throw new ArgumentException("The number of alignments must be at least as large as the number of columns.");
-            }
-            IEnumerable<DataRow > rows = table.Rows.Cast<DataRow>().ToList();
-            IEnumerable<int > columnWidths = GetColumnWidths(table).ToList();
-            if(HasTopBorder)
-            {
-                yield return GetRowSeparator(TopBorderChar, columnWidths);
-            }
-            foreach(DataRow row in rows)
-            {
-                yield return FormatRow(row, alignments, columnWidths);
-            }
-            if(HasBottomBorder)
-            {
-                yield return GetRowSeparator(BottomBorderChar, columnWidths);
-            }
-        }
-
-        /// <summary>
-        /// Formats a row.
-        /// </summary>
-        /// <param name="row">
-        /// The row to format.
-        /// </param>
-        /// <param name="columnWidths">
-        /// The widths of the columns to format the row.
-        /// </param>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown if <paramref name="row"/> or <paramref name="columnWidths"/>
-        /// is <see langword="null" />.
-        /// </exception>
-        protected string FormatRow(IEnumerable<string> row, IEnumerable<int> columnWidths)
-        {
-            if(row == null)
-            {
-                throw new ArgumentNullException("row");
-            }
-            if(columnWidths == null)
-            {
-                throw new ArgumentNullException("columnWidths");
-            }
-            return string.Format("{0}{1}{2}", LeftBorder, ColumnSeparator.Join(row), RightBorder);
-        }
-
-        /// <summary>
-        /// Formats a <see cref="DataRow" />.
-        /// </summary>
-        /// <param name="row">
-        /// The <see cref="DataRow" /> to format.
-        /// </param>
-        /// <param name="alignments">
-        /// The alignments for each column.
-        /// </param>
-        /// <param name="columnWidths">
-        /// The widths of the columns to format the row.
-        /// </param>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown if <paramref name="row"/> (or <see cref="DataRow.ItemArray" /> thereon), <paramref name="alignments"/> (or any member thereof),
-        /// or <paramref name="columnWidths"/>
-        /// is <see langword="null" />.
-        /// </exception>
-        protected string FormatRow(DataRow row, IEnumerable<Func<object, int, string>> alignments, IEnumerable<int> columnWidths)
-        {
-            if(row == null)
-            {
-                throw new ArgumentNullException("row");
-            }
-            if(row.ItemArray == null)
-            {
-                throw new ArgumentNullException("row");
-            }
-            if(alignments == null)
-            {
-                throw new ArgumentNullException("alignments");
-            }
-            if(alignments.Contains(null))
-            {
-                throw new ArgumentNullException("alignments");
-            }
-            if(columnWidths == null)
-            {
-                throw new ArgumentNullException("columnWidths");
-            }
-            IEnumerable<string > cells = row.ItemArray.EquiZip(alignments, columnWidths, (value, align, width) => align(value, width));
-            return FormatRow(cells, columnWidths);
-        }
-
-        /// <summary>
-        /// Find the widths in characters for all the columns
-        /// in the given <see cref="DataTable" />.
-        /// </summary>
-        /// <param name="table">
-        /// The <see cref="DataTable" /> whose column widths to find.
-        /// </param>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown if <paramref name="table"/> is <see langword="null" /> .
-        /// </exception>
-        protected IEnumerable<int> GetColumnWidths(DataTable table)
-        {
-            if(table == null)
-            {
-                throw new ArgumentNullException("table");
-            }
-            IEnumerable<DataColumn > columns = table.Columns.Cast<DataColumn>().ToList();
-            IEnumerable<DataRow > rows = table.Rows.Cast<DataRow>().ToList();
-            Func<DataRow, int, uint > rowLengthAt = (row, columnIndex) => {
-                return (uint)row.ItemArray[columnIndex].ToString().Length;
-            };
-            return columns.Select((column, columnIndex) => (int)rows.MaxOrIdentity(row => rowLengthAt(row, columnIndex)));
-        }
-
-        /// <summary>
-        /// Generate a separator to insert between rows.
-        /// </summary>
         /// <param name="separator">
-        /// A <see cref="char" /> to use in the separator.
+        /// The character to use to separate the two.
         /// </param>
-        /// <param name="columnWidths">
-        /// The widths, in characters, of the columns in the table.
-        /// </param>
-        protected string GetRowSeparator(char separator, IEnumerable<int> columnWidths)
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="table"/> is <see langword="null" />.
+        /// </exception>
+        public string GetRowSeparator(Table table, char separator)
         {
-            string text = Corner.Join(columnWidths.Select(width => new string(separator, width)));
-            return Corner + text + Corner;
+            if(table == null)
+            {
+                throw new ArgumentNullException("table");
+            }
+            return GetFormatterFor(table).GetRowSeparator(separator);
         }
 
         /// <summary>
@@ -448,6 +306,206 @@ namespace Ngol.Utilities.TextFormat.Table
             return borderChar == '\0' ? string.Empty : borderChar.ToString();
         }
 
+        private InnerFormatter GetFormatterFor(Table table)
+        {
+            if(table == null)
+            {
+                throw new ArgumentNullException("table");
+            }
+            return new InnerFormatter(table, LeftBorderChar, ColumnSeparatorChar, RightBorderChar, TopBorderChar, BottomBorderChar, CornerChar);
+        }
+
         #endregion
+
+        internal class InnerFormatter
+        {
+            #region Properties
+
+            /// <summary>
+            /// The bottom border of the table.
+            /// </summary>
+            internal readonly char BottomBorderChar;
+
+            /// <summary>
+            /// The character used to separate columns.
+            /// </summary>
+            internal string ColumnSeparator
+            {
+                get { return BorderCharToString(ColumnSeparatorChar); }
+            }
+
+            internal IEnumerable<int> ColumnWidths { get; set; }
+
+            /// <summary>
+            /// The character used to separate columns.
+            /// </summary>
+            internal readonly char ColumnSeparatorChar;
+
+            /// <summary>
+            /// The character used at the corner of cells.
+            /// </summary>
+            internal string Corner
+            {
+                get { return BorderCharToString(CornerChar); }
+            }
+
+            /// <summary>
+            /// The character used at corners of cells.
+            /// </summary>
+            internal readonly char CornerChar;
+
+            /// <summary>
+            /// Gets a value indicating whether this instance has bottom border.
+            /// </summary>
+            /// <value>
+            /// <see langword="true" /> if this instance has bottom border; otherwise, <see langword="false" />.
+            /// </value>
+            internal bool HasBottomBorder
+            {
+                get { return BottomBorderChar != '\0'; }
+            }
+
+            /// <summary>
+            /// Gets a value indicating whether this instance has left border.
+            /// </summary>
+            /// <value>
+            /// <see langword="true" /> if this instance has left border; otherwise, <see langword="false" />.
+            /// </value>
+            internal bool HasLeftBorder
+            {
+                get { return LeftBorderChar != '\0'; }
+            }
+
+            /// <summary>
+            /// Gets a value indicating whether this instance has right border.
+            /// </summary>
+            /// <value>
+            /// <see langword="true" /> if this instance has right border; otherwise, <see langword="false" />.
+            /// </value>
+            internal bool HasRightBorder
+            {
+                get { return RightBorderChar != '\0'; }
+            }
+
+            /// <summary>
+            /// Does this table have a top border?
+            /// </summary>
+            internal bool HasTopBorder
+            {
+                get { return TopBorderChar != '\0'; }
+            }
+
+            /// <summary>
+            /// The character used on the left border of the table.
+            /// </summary>
+            internal string LeftBorder
+            {
+                get { return BorderCharToString(LeftBorderChar); }
+            }
+
+            /// <summary>
+            /// The character used on the left border of the table.
+            /// </summary>
+            internal readonly char LeftBorderChar;
+
+            /// <summary>
+            /// The character used on the right border of the table.
+            /// </summary>
+            internal string RightBorder
+            {
+                get { return BorderCharToString(RightBorderChar); }
+            }
+
+            /// <summary>
+            /// The character used on the right border of the table.
+            /// </summary>
+            internal readonly char RightBorderChar;
+
+            /// <summary>
+            /// The <see cref="Table" /> which is being formatted.
+            /// </summary>
+            internal readonly Table Table;
+
+            /// <summary>
+            /// The top border of the table.
+            /// </summary>
+            internal readonly char TopBorderChar;
+
+            #endregion
+
+            #region Constructors
+
+            internal InnerFormatter(Table table, char leftBorder, char columnSeparator, char rightBorder, char topBorder, char bottomBorder, char corner)
+            {
+                if(table == null)
+                {
+                    throw new ArgumentNullException("table");
+                }
+                Table = table;
+                ColumnWidths = Table.GetColumnWidths();
+                TopBorderChar = topBorder;
+                BottomBorderChar = bottomBorder;
+                LeftBorderChar = leftBorder;
+                ColumnSeparatorChar = columnSeparator;
+                RightBorderChar = rightBorder;
+                CornerChar = corner;
+            }
+
+            #endregion
+
+            #region Methods
+
+            /// <summary>
+            /// Format a <see cref="Table" /> to be printed on the console.
+            /// </summary>
+            internal IEnumerable<string> Format()
+            {
+                if(HasTopBorder)
+                {
+                    yield return GetRowSeparator(TopBorderChar);
+                }
+                foreach(Row row in Table.Rows)
+                {
+                    yield return FormatRow(row);
+                }
+                if(HasBottomBorder)
+                {
+                    yield return GetRowSeparator(BottomBorderChar);
+                }
+            }
+
+            /// <summary>
+            /// Formats a <see cref="Row" />.
+            /// </summary>
+            /// <param name="row">
+            /// The <see cref="Row" /> to format.
+            /// </param>
+            /// <exception cref="ArgumentNullException">
+            /// Thrown if <paramref name="row"/> is <see langword="null" />.
+            /// </exception>
+            internal string FormatRow(Row row)
+            {
+                if(row == null)
+                {
+                    throw new ArgumentNullException("row");
+                }
+                IEnumerable<string > cells = row.EquiZip(Table.Columns, ColumnWidths, (value, column, width) => column.Format(value, width));
+                return LeftBorder + ColumnSeparator.Join(cells) + RightBorder;
+            }
+
+            /// <summary>
+            /// Generate a separator to insert between rows.
+            /// </summary>
+            /// <param name="separator">
+            /// A <see cref="char" /> to use in the separator.
+            /// </param>
+            internal string GetRowSeparator(char separator)
+            {
+                string text = Corner.Join(ColumnWidths.Select(width => new string(separator, width)));
+                return string.Format("{0}{1}{2}", HasLeftBorder ? Corner : "", text, HasRightBorder ? Corner : "");
+            }
+
+            #endregion
+        }
     }
 }

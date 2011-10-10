@@ -76,19 +76,29 @@ namespace Ngol.Utilities.Collections.Extensions
         public static void CopyTo<T>(this IEnumerable<T> iterable, T[] array, int arrayIndex)
         {
             if(iterable == null)
+            {
                 throw new ArgumentNullException("iterable");
+            }
             if(array == null)
+            {
                 throw new ArgumentNullException("array");
+            }
             if(array.GetLowerBound(0) != 0)
+            {
                 throw new ArgumentException("Array must be zero-indexed.");
+            }
             if(arrayIndex < 0)
+            {
                 throw new ArgumentException("Array index must be at least zero.");
+            }
             if(iterable.Count() + arrayIndex > array.Length)
+            {
                 throw new ArgumentException("There is not enough space in the array to perform the copy operation.");
+            }
             ForEachIndexed(iterable, arrayIndex, (value, index) =>
-                {
-                    array[index] = value;
-                });
+            {
+                array[index] = value;
+            });
         }
 
         /// <summary>
@@ -114,7 +124,9 @@ namespace Ngol.Utilities.Collections.Extensions
         public static IEnumerable<NumberedEntry<T>> Enumerate<T>(this IEnumerable<T> iterable, int startIndex)
         {
             if(iterable == null)
+            {
                 throw new ArgumentNullException("iterable");
+            }
             int index = startIndex;
             foreach(T value in iterable)
             {
@@ -164,7 +176,9 @@ namespace Ngol.Utilities.Collections.Extensions
         public static void ForEachIndexed<T>(this IEnumerable<T> iterable, int startIndex, Action<T, int> action)
         {
             if(action == null)
+            {
                 throw new ArgumentNullException("action");
+            }
             Enumerate(iterable, startIndex).ForEach(entry => action(entry.Value, entry.Index));
         }
 
@@ -183,8 +197,10 @@ namespace Ngol.Utilities.Collections.Extensions
         public static void ForEach<TKey, TValue>(this IEnumerable<KeyValuePair<TKey, TValue>> iterable, Action<TKey, TValue> action)
         {
             if(action == null)
+            {
                 throw new ArgumentNullException("action");
-            Action<KeyValuePair<TKey, TValue>> actualAction = keyValuePair => action(keyValuePair.Key, keyValuePair.Value);
+            }
+            Action<KeyValuePair<TKey, TValue >> actualAction = keyValuePair => action(keyValuePair.Key, keyValuePair.Value);
             MoreEnumerable.ForEach(iterable, actualAction);
         }
 
@@ -223,8 +239,10 @@ namespace Ngol.Utilities.Collections.Extensions
         public static void ForEach<TKey, TValue>(this IEnumerable<KeyValuePair<TKey, TValue>> iterable, int startIndex, Action<TKey, TValue, int> action)
         {
             if(action == null)
+            {
                 throw new ArgumentNullException("action");
-            Action<KeyValuePair<TKey, TValue>, int> actualAction = (keyValuePair, index) => action(keyValuePair.Key, keyValuePair.Value, index);
+            }
+            Action<KeyValuePair<TKey, TValue>, int > actualAction = (keyValuePair, index) => action(keyValuePair.Key, keyValuePair.Value, index);
             ForEachIndexed(iterable, startIndex, actualAction);
         }
 
@@ -284,9 +302,9 @@ namespace Ngol.Utilities.Collections.Extensions
         /// </exception>
         public static void ForEachIndexedPair<T>(this IEnumerable<T> iterable, int startIndex, Action<T, T, int> action)
         {
-            Func<T, T, Tuple<T, T>> selector = (a, b) => Tuple.Create(a, b);
-            IEnumerable<Tuple<T, T>> pairs = Pairs(iterable, selector);
-            Action<Tuple<T, T>, int> actualAction = (tuple, index) => action(tuple.Item1, tuple.Item2, index);
+            Func<T, T, Tuple<T, T >> selector = (a, b) => Tuple.Create(a, b);
+            IEnumerable<Tuple<T, T >> pairs = Pairs(iterable, selector);
+            Action<Tuple<T, T>, int > actualAction = (tuple, index) => action(tuple.Item1, tuple.Item2, index);
             ForEachIndexed(pairs, startIndex, actualAction);
         }
 
@@ -382,11 +400,17 @@ namespace Ngol.Utilities.Collections.Extensions
         public static void ForEachEqualIndexed<T1, T2>(this IEnumerable<T1> first, IEnumerable<T2> second, Action<T1, T2, int> action)
         {
             if(first == null)
+            {
                 throw new ArgumentNullException("first");
+            }
             if(second == null)
+            {
                 throw new ArgumentNullException("second");
+            }
             if(action == null)
+            {
                 throw new ArgumentNullException("action");
+            }
             first.ForEachEqualIndexed(second, 0, action);
         }
 
@@ -419,11 +443,17 @@ namespace Ngol.Utilities.Collections.Extensions
         public static void ForEachEqualIndexed<T1, T2>(this IEnumerable<T1> first, IEnumerable<T2> second, int startIndex, Action<T1, T2, int> action)
         {
             if(first == null)
+            {
                 throw new ArgumentNullException("first");
+            }
             if(second == null)
+            {
                 throw new ArgumentNullException("second");
+            }
             if(action == null)
+            {
                 throw new ArgumentNullException("action");
+            }
             first.EquiZip<T1, T2, Tuple<T1, T2>>(second, Tuple.Create<T1, T2>)
                  .ForEachIndexed(startIndex, (entry, index) => action(entry.Item1, entry.Item2, index));
         }
@@ -696,9 +726,13 @@ namespace Ngol.Utilities.Collections.Extensions
         public static IEnumerable<TResult> SelectMany<TSource, TResult>(this IEnumerable<TSource> source, Func<TSource, int, IEnumerable<TResult>> selector)
         {
             if(source == null)
+            {
                 throw new ArgumentNullException("iterable");
+            }
             if(selector == null)
+            {
                 throw new ArgumentNullException("selector");
+            }
             return source.SelectMany(0, selector);
         }
 
@@ -726,9 +760,13 @@ namespace Ngol.Utilities.Collections.Extensions
         public static IEnumerable<TResult> SelectMany<TSource, TResult>(this IEnumerable<TSource> source, int startIndex, Func<TSource, int, IEnumerable<TResult>> selector)
         {
             if(source == null)
+            {
                 throw new ArgumentNullException("iterable");
+            }
             if(selector == null)
+            {
                 throw new ArgumentNullException("selector");
+            }
             return source.Enumerate(startIndex).SelectMany(entry => selector(entry.Value, entry.Index));
         }
 
@@ -744,7 +782,9 @@ namespace Ngol.Utilities.Collections.Extensions
         public static IOrderedEnumerable<T> Sorted<T>(this IEnumerable<T> iterable) where T : IComparable<T>
         {
             if(iterable == null)
+            {
                 throw new ArgumentNullException("iterable");
+            }
             return iterable.OrderBy<T, T>(item => item);
         }
 
@@ -775,7 +815,9 @@ namespace Ngol.Utilities.Collections.Extensions
         public static IOrderedEnumerable<T> Sorted<T>(this IEnumerable<T> iterable, IComparer<T> comparer)
         {
             if(iterable == null)
+            {
                 throw new ArgumentNullException("iterable");
+            }
             return iterable.OrderBy<T, T>(item => item, comparer);
         }
 
@@ -988,4 +1030,3 @@ namespace Ngol.Utilities.Collections.Extensions
         }
     }
 }
-
