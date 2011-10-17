@@ -64,11 +64,8 @@ namespace Ngol.Utilities.TextFormat.Table
         /// </param>
         public Table(string tableName=null, Alignment headerAlignment=null)
         {
-            if(headerAlignment == null)
-            {
-                headerAlignment = StringFormatting.LeftJustified;
-            }
-            HeaderAlignment = headerAlignment;
+            Title = tableName ?? string.Empty;
+            HeaderAlignment = headerAlignment ?? StringFormatting.LeftJustified;
             Columns = new ColumnCollection();
             Rows = new RowCollection(this);
         }

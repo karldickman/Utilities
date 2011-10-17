@@ -38,12 +38,12 @@ namespace Ngol.Utilities.TextFormat
                 return Blank(width);
             }
             string result = toCenter.ToString();
-            int resultLength = result.Length;
-            for(int i = 0; i < SpacesBefore (resultLength, width); i++)
+            if(result.Length > width)
             {
-                result = " " + result + " ";
+                return result;
             }
-            return result;
+            int spaces = (width - result.Length) / 2;
+            return new string(' ', spaces) + result + new string(' ', spaces);
         }
         
         /// <summary>
@@ -167,24 +167,6 @@ namespace Ngol.Utilities.TextFormat
                 return toPad.ToString().PadRight(width);
             }
             return toPad.ToString().PadLeft(width);
-        }
-        
-        /// <summary>
-        /// Calculate the number of spaces needed to center a word.
-        /// </summary>
-        /// <param name="wordLength">
-        /// A <see cref="System.Int32"/>.  The length of the word.
-        /// </param>
-        /// <param name="width">
-        /// A <see cref="System.Int32"/>.  The width of the string in which the
-        /// word will be centered.
-        /// </param>
-        /// <returns>
-        /// A <see cref="System.Int32"/>.
-        /// </returns>
-        private static int SpacesBefore(int wordLength, int width)
-        {
-            return (width - wordLength) / 2;
         }
     }
 }

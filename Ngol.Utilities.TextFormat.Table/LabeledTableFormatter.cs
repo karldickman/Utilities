@@ -157,8 +157,8 @@ namespace Ngol.Utilities.TextFormat.Table
             /// </summary>
             internal string FormatHeader()
             {
-                var align = new Func<string, int, string >(Table.HeaderAlignment);
-                IList<string > cells = Table.Headers.EquiZip(ColumnWidths, align).ToList();
+                var align = new Func<string, int, string>(Table.HeaderAlignment);
+                IList<string> cells = Table.Headers.EquiZip(ColumnWidths, align).ToList();
                 return LeftBorder + ColumnSeparator.Join(cells) + RightBorder;
             }
 
