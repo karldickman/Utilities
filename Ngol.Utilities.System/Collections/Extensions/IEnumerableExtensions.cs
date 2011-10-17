@@ -302,9 +302,9 @@ namespace Ngol.Utilities.Collections.Extensions
         /// </exception>
         public static void ForEachIndexedPair<T>(this IEnumerable<T> iterable, int startIndex, Action<T, T, int> action)
         {
-            Func<T, T, Tuple<T, T >> selector = (a, b) => Tuple.Create(a, b);
-            IEnumerable<Tuple<T, T >> pairs = Pairs(iterable, selector);
-            Action<Tuple<T, T>, int > actualAction = (tuple, index) => action(tuple.Item1, tuple.Item2, index);
+            Func<T, T, Tuple<T, T>> selector = (a, b) => Tuple.Create(a, b);
+            IEnumerable<Tuple<T, T>> pairs = Pairs(iterable, selector);
+            Action<Tuple<T, T>, int> actualAction = (tuple, index) => action(tuple.Item1, tuple.Item2, index);
             ForEachIndexed(pairs, startIndex, actualAction);
         }
 

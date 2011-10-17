@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{C0E9A328-F7F4-4CEA-831B-5F0013EB16AF}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Ngol.Utilities.System.Tests</RootNamespace>
+    <AssemblyName>Ngol.Utilities.System.Tests</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="nunit.core, Version=2.4.8.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77" />
+    <Reference Include="nunit.framework, Version=2.4.8.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Compile Include="TestPairs.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Ngol.Utilities.System\Ngol.Utilities.System.csproj">
+      <Project>{B53B9249-70AC-4414-95A8-0E7838885C2B}</Project>
+      <Name>Ngol.Utilities.System</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Ngol.Utilities.NUnit\Ngol.Utilities.NUnit.csproj">
+      <Project>{60ED6A54-F0A6-4AFC-9E81-C783C935980C}</Project>
+      <Name>Ngol.Utilities.NUnit</Name>
+    </ProjectReference>
+  </ItemGroup>
+</Project>
