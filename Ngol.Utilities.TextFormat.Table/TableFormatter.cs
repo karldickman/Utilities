@@ -160,7 +160,7 @@ namespace Ngol.Utilities.TextFormat.Table
         /// columns and no other decorations.
         /// </summary>
         /// <param name="columnSeparator">
-        /// The <see cref="System.Char"/> used to separate the columns.
+        /// The <see cref="char"/> used to separate the columns.
         /// </param>
         public TableFormatter(char columnSeparator) : this('\0', columnSeparator, '\0', '\0', '\0', '\0')
         {
@@ -171,10 +171,10 @@ namespace Ngol.Utilities.TextFormat.Table
         /// columns and a vertical border.
         /// </summary>
         /// <param name="verticalBorder">
-        /// The <see cref="System.Char"/> used for the tables' vertical border.
+        /// The <see cref="char"/> used for the tables' vertical border.
         /// </param>
         /// <param name="columnSeparator">
-        /// The <see cref="System.Char"/> used to separate the columns.
+        /// The <see cref="char"/> used to separate the columns.
         /// </param>
         public TableFormatter(char verticalBorder, char columnSeparator) : this(verticalBorder, columnSeparator, verticalBorder, '\0', '\0', '\0')
         {
@@ -185,13 +185,13 @@ namespace Ngol.Utilities.TextFormat.Table
         /// columns and a vertical border.
         /// </summary>
         /// <param name="leftBorder">
-        /// The <see cref="System.Char"/> used for the tables' left border.
+        /// The <see cref="char" /> used for the tables' left border.
         /// </param>
         /// <param name="columnSeparator">
-        /// The <see cref="System.Char"/> used to separate the columns.
+        /// The <see cref="char" /> used to separate the columns.
         /// </param>
         /// <param name="rightBorder">
-        /// The <see cref="System.Char"/> used for the table's right border.
+        /// The <see cref="char" /> used for the table's right border.
         /// </param>
         public TableFormatter(char leftBorder, char columnSeparator, char rightBorder) : this(leftBorder, columnSeparator, rightBorder, '\0', '\0', '\0')
         {
@@ -202,16 +202,16 @@ namespace Ngol.Utilities.TextFormat.Table
         /// columns, a vertical border, and a horizontal border.
         /// </summary>
         /// <param name="leftBorder">
-        /// The <see cref="System.Char"/> used for the tables' left border.
+        /// The <see cref="char" /> used for the tables' left border.
         /// </param>
         /// <param name="columnSeparator">
-        /// The <see cref="System.Char"/> used to separate the columns.
+        /// The <see cref="char" /> used to separate the columns.
         /// </param>
         /// <param name="rightBorder">
-        /// The <see cref="System.Char"/> used for the tables' right border.
+        /// The <see cref="char" /> used for the tables' right border.
         /// </param>
         /// <param name="horizontalBorder">
-        /// The <see cref="System.Char"/> used for the tables' horizontal
+        /// The <see cref="char" /> used for the tables' horizontal
         /// borders.
         /// </param>
         public TableFormatter(char leftBorder, char columnSeparator, char rightBorder, char horizontalBorder) : this(leftBorder, columnSeparator, rightBorder, horizontalBorder, horizontalBorder, horizontalBorder)
@@ -223,22 +223,22 @@ namespace Ngol.Utilities.TextFormat.Table
         /// columns, a vertical border, and a horizontal border.
         /// </summary>
         /// <param name="leftBorder">
-        /// The <see cref="System.Char"/> used for the tables' left border.
+        /// The <see cref="char" /> used for the tables' left border.
         /// </param>
         /// <param name="columnSeparator">
-        /// The <see cref="System.Char"/> used to separate the columns.
+        /// The <see cref="char" /> used to separate the columns.
         /// </param>
         /// <param name="rightBorder">
-        /// The <see cref="System.Char"/> used for the tables' right border.
+        /// The <see cref="char" /> used for the tables' right border.
         /// </param>
         /// <param name="topBorder">
-        /// The <see cref="System.Char"/> used for the tables' top border.
+        /// The <see cref="char" /> used for the tables' top border.
         /// </param>
         /// <param name="bottomBorder">
-        /// The <see cref="System.Char"/> used for the tables' bottom border.
+        /// The <see cref="char" /> used for the tables' bottom border.
         /// </param>
         /// <param name="corner">
-        /// The <see cref="System.Char"/> used for intersections between
+        /// The <see cref="char" /> used for intersections between
         /// borders.
         /// </param>
         public TableFormatter(char leftBorder, char columnSeparator, char rightBorder, char topBorder, char bottomBorder, char corner)

@@ -53,7 +53,7 @@ namespace Ngol.Utilities.Collections.Extensions
         /// The one-dimensional <see cref="Array" /> that is the destination of the elements copied from the sequence.
         /// </param>
         /// <param name="arrayIndex">
-        /// A <see cref="System.Int32"/>
+        /// The index at which to start copying the array.
         /// </param>
         /// <exception cref="ArgumentException">
         /// Thrown if
@@ -179,7 +179,8 @@ namespace Ngol.Utilities.Collections.Extensions
             {
                 throw new ArgumentNullException("action");
             }
-            Enumerate(iterable, startIndex).ForEach(entry => action(entry.Value, entry.Index));
+            Enumerate(iterable, startIndex)
+                .ForEach(entry => action(entry.Value, entry.Index));
         }
 
         /// <summary>
@@ -342,7 +343,7 @@ namespace Ngol.Utilities.Collections.Extensions
             {
                 throw new ArgumentNullException("action");
             }
-            first.Zip(second, Tuple.Create<T1, T2>)
+            Enumerable.Zip(first, second, Tuple.Create<T1, T2>)
                  .ForEach(pair => action(pair.Item1, pair.Item2));
         }
 
@@ -576,9 +577,6 @@ namespace Ngol.Utilities.Collections.Extensions
         /// <param name="iterable">
         /// The sequence to check.
         /// </param>
-        /// <returns>
-        /// A <see cref="System.Boolean"/>
-        /// </returns>
         /// <exception cref="ArgumentNullException">
         /// Thrown if <paramref name="iterable"/> is <see langword="null" />.
         /// </exception>
@@ -851,7 +849,7 @@ namespace Ngol.Utilities.Collections.Extensions
             {
                 throw new ArgumentNullException("selector");
             }
-            return iterable.Zip(iterable.Skip(1), selector);
+            return Enumerable.Zip(iterable, iterable.Skip(1), selector);
         }
 
         /// <summary>
@@ -907,8 +905,10 @@ namespace Ngol.Utilities.Collections.Extensions
             {
                 throw new ArgumentNullException("selector");
             }
-            return first.Zip(second, Tuple.Create<TIn1, TIn2>)
-                        .Zip(third, (tuple, value3) => selector(tuple.Item1, tuple.Item2, value3));
+            return Enumerable
+                .Zip(Enumerable
+                    .Zip(first, second, Tuple.Create<TIn1, TIn2>),
+                third, (tuple, value3) => selector(tuple.Item1, tuple.Item2, value3));
         }
 
 

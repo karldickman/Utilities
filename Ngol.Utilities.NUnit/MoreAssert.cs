@@ -32,7 +32,11 @@ namespace Ngol.Utilities.NUnit
             Assert.IsNotNull(actual);
             Assert.IsNotNull(expected);
             MoreAssert.HaveSameCount(expected, actual);
-            expected.ForEach(actual, Assert.AreEqual);
+            var pairs = expected.Zip(actual, (e, a) => new { Expected = e, Actual = a, });
+            foreach(var pair in pairs)
+            {
+                Assert.AreEqual(pair.Expected, pair.Actual);
+            }
         }
 
         /// <summary>
