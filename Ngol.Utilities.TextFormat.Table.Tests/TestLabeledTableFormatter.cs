@@ -58,7 +58,7 @@ namespace Ngol.Utilities.TextFormat.Table.Tests
         public void TestHytekFormat()
         {
             string expected =
-@"=+===================+====+=============+========+======
+                @"=+===================+====+=============+========+======
  |Name               |Year|School       |Finals  |Points
 =+===================+====+=============+========+======
 1|Theron Morgan-Brown|1997|Lewis & Clark|28:10.00|1     ";
@@ -70,7 +70,7 @@ namespace Ngol.Utilities.TextFormat.Table.Tests
         public void TestPrettyFormat()
         {
             string expected =
-@"+------+-----------+
+                @"+------+-----------+
 |thing |stuff      |
 +------+-----------+
 |xx    |zzz        |
