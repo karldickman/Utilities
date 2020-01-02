@@ -34,7 +34,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="MoreLinq">
-      <HintPath>..\packages\morelinq.1.1.1\lib\net35\MoreLinq.dll</HintPath>
+      <HintPath>..\..\XcAnalyze\packages\morelinq.1.1.1\lib\net35\MoreLinq.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -53,9 +53,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Ngol.Utilities.TextFormat\Ngol.Utilities.TextFormat.csproj">
       <Project>{C596C8BD-7CA7-4E11-9969-D0CCB140A64B}</Project>
       <Name>Ngol.Utilities.TextFormat</Name>
@@ -64,5 +61,8 @@
       <Project>{B53B9249-70AC-4414-95A8-0E7838885C2B}</Project>
       <Name>Ngol.Utilities.System</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

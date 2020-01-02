@@ -34,7 +34,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="MoreLinq">
-      <HintPath>..\packages\morelinq.1.1.1\lib\net35\MoreLinq.dll</HintPath>
+      <HintPath>..\..\XcAnalyze\packages\morelinq.1.1.1\lib\net35\MoreLinq.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
